@@ -27,9 +27,7 @@ dependencies {
 //	implementation 'org.springframework.cloud:spring-cloud-gcp-starter-pubsub'
 //	implementation 'org.springframework.cloud:spring-cloud-gcp-starter-storage'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
