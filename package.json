@@ -1,0 +1,27 @@
+{
+  "name": "track-that-bug",
+  "version": "1.0.0",
+  "description": "A bug tracker application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesandrews23/track-that-bug.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamesandrews23/track-that-bug/issues"
+  },
+  "homepage": "https://github.com/jamesandrews23/track-that-bug#readme",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  },
+  "devDependencies": {
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  }
+}
