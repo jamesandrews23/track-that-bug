@@ -37,9 +37,9 @@ dependencies {
 task webpack(type: Exec) {
 	inputs.file("package-lock.json").withPathSensitivity(PathSensitivity.RELATIVE)
 	inputs.dir("src").withPathSensitivity(PathSensitivity.RELATIVE)
-	outputs.dir("$buildDir/js")
+	outputs.dir("$buildDir/resources/main/static/js")
 	outputs.cacheIf { true }
-	commandLine "$projectDir/node_modules/.bin/webpack.cmd", "src/index.js", "-o", "$buildDir/js/main.js"
+	commandLine "$projectDir/node_modules/.bin/webpack.cmd", "src/index.js", "-o", "$buildDir/resources/main/static/js/main.js"
 }
 
 dependencyManagement {
