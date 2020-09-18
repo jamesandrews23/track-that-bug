@@ -1,12 +1,5 @@
-import _ from 'lodash';
+import React from 'react';
+import ReactDom from "react-dom";
+import Main from './Main';
 
-function component () {
-    var element = document.createElement('div');
-
-    /* lodash is used here for bundling demonstration purposes */
-    element.innerHTML = _.join(['Build', 'together;', 'not', 'alone'], ' ');
-
-    return element;
-}
-
-document.body.appendChild(component());
+ReactDom.render(<Main/>, document.getElementById('root'));
