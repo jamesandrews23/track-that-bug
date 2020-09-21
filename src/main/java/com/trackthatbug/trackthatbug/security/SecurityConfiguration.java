@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -52,21 +53,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/", "/login", "/register", "/addUser", "/index").permitAll()
+        http.csrf().disable()
+                .authorizeRequests()
+                .antMatchers( HttpMethod.GET, "/", "/login", "/register", "/addUser", "/index", "/performLogin").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .formLogin()
                 .loginPage("/login.html")
-                .loginProcessingUrl("/login")
+                .loginProcessingUrl("/performLogin")
                 .defaultSuccessUrl("/dashboard", true)
-                .failureUrl("/loginError")
+                .failureUrl("/login.html?error=true")
                 .permitAll()
             .and()
                 .logout()
                 .logoutSuccessUrl("/login")
                 .permitAll();
     }
+
+
 
     @Override
     protected UserDetailsService userDetailsService() {
