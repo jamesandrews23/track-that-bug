@@ -95,6 +95,9 @@ export default function Register() {
                 }
             })
             .then(response => {
+                if(response.data.error){
+                    setError(true);
+                }
                 console.log(response);
             })
             .catch(error => {

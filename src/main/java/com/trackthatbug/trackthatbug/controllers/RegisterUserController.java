@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.controllers;
 
+import com.trackthatbug.trackthatbug.models.Result;
 import com.trackthatbug.trackthatbug.models.User;
 import com.trackthatbug.trackthatbug.repositories.UserRepository;
 import com.trackthatbug.trackthatbug.services.UserDetailsServiceImpl;
@@ -23,12 +24,28 @@ public class RegisterUserController {
 
     @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping(value = "/registerUser", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerUser(@RequestBody @Valid User user, BindingResult result){
+    public ResponseEntity<Result> registerUser(@RequestBody @Valid User user, BindingResult result){
+        Result registerUserResult = new Result();
         if(result.hasErrors()){
-            return new ResponseEntity<>("error", HttpStatus.BAD_REQUEST);
+            registerUserResult.setError(true);
+            return new ResponseEntity<>(registerUserResult, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>("test", HttpStatus.OK);
+        //register new user then return to login if successful`
+        User available = userRepository.findByUsername(user.getUsername());
+        if(available == null){
+            //add user
+            try {
+                userDetailsService.saveUser(user);
+            } catch(Exception e){
+                registerUserResult.setError(true);
+            }
+        } else {
+            //show error
+            registerUserResult.setError(true);
+        }
+
+        return new ResponseEntity<>(registerUserResult, HttpStatus.OK);
     }
 
     @PostMapping("/addUser")

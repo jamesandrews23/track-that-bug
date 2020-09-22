@@ -55,7 +55,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public void saveUser(User user){
         user.setPassword(this.bCryptPasswordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
-        Role userRole = roleRepository.findByRole("ROLE_ADMIN");
+        Role userRole = roleRepository.findByRole("ROLE_USER");
         user.setRoles(new HashSet<>(Collections.singletonList(userRole)));
         userRepository.save(user);
     }
