@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
-@Document(collection = "_users-collection")
+@Document(collection = "users")
 public class User {
     @Id private String id;
 //    @Indexed(unique = true, direction = IndexDirection.DESCENDING)

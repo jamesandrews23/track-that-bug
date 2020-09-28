@@ -8,19 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 import javax.validation.Valid;
 
 @RestController
 public class RegisterUserController {
     private UserDetailsServiceImpl userDetailsService;
     private UserRepository userRepository;
-
 
     @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping(value = "/registerUser", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -46,27 +42,6 @@ public class RegisterUserController {
         }
 
         return new ResponseEntity<>(registerUserResult, HttpStatus.OK);
-    }
-
-    @PostMapping("/addUser")
-    public String addUser(@ModelAttribute User user, Model model){
-        //register new user then return to login if successful`
-        User available = userRepository.findByUsername(user.getUsername());
-        if(available == null){
-            //add user
-            try {
-                userDetailsService.saveUser(user);
-                model.addAttribute("userCreated", true);
-            } catch(Exception e){
-                model.addAttribute("userError", true);
-            }
-
-        } else {
-            //show error
-            model.addAttribute("userError", true);
-        }
-
-        return "registerUser.html";
     }
 
     public UserDetailsServiceImpl getUserDetailsService() {

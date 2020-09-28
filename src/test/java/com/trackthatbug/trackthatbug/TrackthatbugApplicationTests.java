@@ -30,4 +30,14 @@ class TrackthatbugApplicationTests {
 //				.andExpect(content().string(""));
 	}
 
+	@Test
+	public void testCreateIssue() throws Exception {
+//		mockMvc.perform(post("/createIssue")
+//			.contentType(MediaType.APPLICATION_JSON_VALUE)
+//			.content("{\"user\":\"jamesandrews23\",\"assignedTo\":\"Doe\",\"createdOn\":\"12341234\",\"createdBy\":\"james\",\"description\":\"this is it\",\"title\":\"this is the title\"}")
+//			.accept(MediaType.APPLICATION_JSON_VALUE))
+//			.andExpect(status().isOk())
+//			.andExpect(content().string(""));
+	}
+
 }
