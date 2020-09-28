@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.models;
 
+import org.bson.types.Binary;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
@@ -24,6 +25,7 @@ public class Issue {
     @CreatedDate
     private Date createdOn;
     //todo @LastModifiedDate add a field for the last modified date
+    private Binary file;
 
     public Issue() {
         this.status = Status.OPEN;
@@ -108,5 +110,13 @@ public class Issue {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Binary getFile() {
+        return file;
+    }
+
+    public void setFile(Binary file) {
+        this.file = file;
     }
 }

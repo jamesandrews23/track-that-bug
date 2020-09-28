@@ -4,6 +4,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import axios from "axios";
+import {DropzoneArea} from "material-ui-dropzone";
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -20,16 +21,29 @@ export default function AddBug(){
 
     const [title, setTitle] = React.useState("");
     const [description, setDescription] = React.useState("");
+    const [files, setFiles] = React.useState();
 
     const handleCreateIssue = function(e){
         e.preventDefault();
 
+        let form = new FormData();
+
+        form.append("properties", new Blob([JSON.stringify({
+            title: title,
+            description: description
+        })], {
+            type: "application/json"
+        }));
+
+        files.forEach(file =>{
+           form.append("files", file, file.name);
+        });
+
         axios.post('/createIssue',
-            JSON.stringify({title: title, description: description}),
+            form,
             {
                 headers: {
-                    'Content-Type' : 'application/json',
-                    'Accept' : 'application/json'
+                    'Content-Type' : undefined
                 }
             })
             .then(response => {
@@ -66,9 +80,13 @@ export default function AddBug(){
                         fullWidth
                         id="description"
                         label="Description"
-                        autoFocus
                         onChange={e => setDescription(e.target.value)}
                         value={description}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <DropzoneArea
+                        onChange={(files) => setFiles(files)}
                     />
                 </Grid>
             </Grid>
