@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.models;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -12,15 +13,17 @@ import java.util.Date;
 public class Issue {
     @Id private String id;
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
-    private int issueNumber;
+    private long issueNumber;
     private String user;
     private String assignedTo;
-//    private ZonedDateTime createdOn; //need a mongodb converter to use ZonedDateTime, use Date for now
+//    private ZonedDateTime createdOn; //todo need a mongodb converter to use ZonedDateTime, use Date for now
     private String createdBy;
     private String description;
     private String title;
     private Status status;
+    @CreatedDate
     private Date createdOn;
+    //todo @LastModifiedDate add a field for the last modified date
 
     public Issue() {
         this.status = Status.OPEN;
@@ -34,11 +37,11 @@ public class Issue {
         this.id = id;
     }
 
-    public int getIssueNumber() {
+    public long getIssueNumber() {
         return issueNumber;
     }
 
-    public void setIssueNumber(int issueNumber) {
+    public void setIssueNumber(long issueNumber) {
         this.issueNumber = issueNumber;
     }
 
