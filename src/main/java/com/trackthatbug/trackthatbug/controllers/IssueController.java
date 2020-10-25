@@ -17,9 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
+import java.io.*;
 import java.security.Principal;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 import java.util.Date;
 
 @RestController
@@ -29,21 +30,51 @@ public class IssueController {
 
     @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping(value = "/createIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Result> createIssue(@RequestPart("properties") @Valid Issue issue,
-                                              @RequestPart("files") MultipartFile[] files, BindingResult result, Principal principal){
+    public ResponseEntity<Result<Issue>> createIssue(@RequestPart("properties") @Valid Issue issue,
+                                              @RequestPart("files") MultipartFile[] files, BindingResult bindingResult, Principal principal){
+        Result<Issue> createdIssue = new Result<Issue>();
         String user = principal.getName();
         issue.setUser(user);
         issue.setCreatedBy(user);
         issue.setCreatedOn(new Date());
         issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
-        try {
-            issue.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
-        } catch(IOException e){
-            //if file fails to load show error
-            return new ResponseEntity<>(new Result(), HttpStatus.BAD_REQUEST);
+
+        if(files.length > 0){
+            try {
+                issue.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+            } catch(IOException e){
+                //if file fails to load show error
+                createdIssue.setPayload(issue);
+                return new ResponseEntity<>(createdIssue, HttpStatus.BAD_REQUEST);
+            }
         }
+
         issueRepository.save(issue);
-        return new ResponseEntity<>(new Result(), HttpStatus.OK);
+
+        createdIssue.setPayload(issue);
+        return new ResponseEntity<>(createdIssue, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getIssue/{id}")
+    public ResponseEntity<Result<Issue>> getIssue(@PathVariable("id") String issueNumber){
+        Result<Issue> result = new Result<>();
+        Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNumber));
+        File file = new File("Capture.png");
+        if(issue != null){
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file)){
+                fileOutputStream.write(issue.getFile().getData());
+                FileDescriptor fileDescriptor = fileOutputStream.getFD();
+
+                System.out.println("stop");
+            } catch(Exception e){
+                System.out.println("Failed to write file");
+            }
+
+            issue.setAttachment(file);
+            result.setPayload(issue);
+            result.setMessage("Issue found");
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Autowired

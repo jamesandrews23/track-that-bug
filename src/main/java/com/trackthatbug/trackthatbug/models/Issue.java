@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -26,6 +27,7 @@ public class Issue {
     private Date createdOn;
     //todo @LastModifiedDate add a field for the last modified date
     private Binary file;
+    private File attachment;
 
     public Issue() {
         this.status = Status.OPEN;
@@ -118,5 +120,13 @@ public class Issue {
 
     public void setFile(Binary file) {
         this.file = file;
+    }
+
+    public File getAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(File attachment) {
+        this.attachment = attachment;
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, fade } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import Box from '@material-ui/core/Box';
@@ -21,10 +21,12 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems, secondaryListItems } from './List';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
-import AddBug from "./AddBug";
+import BugsForm from "./BugsForm";
 import Teams from "./Teams";
-import BugReport from './BugReport';
 import Overview from './Overview';
+import InputBase from "@material-ui/core/InputBase";
+import SearchIcon from '@material-ui/icons/Search';
+import axios from 'axios';
 // import Chart from './Chart';
 // import Deposits from './Deposits';
 // import Orders from './Orders';
@@ -121,17 +123,86 @@ const useStyles = makeStyles((theme) => ({
     fixedHeight: {
         height: 240,
     },
+    grow: {
+        flexGrow: 1,
+    },
+    search: {
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: fade(theme.palette.common.white, 0.15),
+        '&:hover': {
+            backgroundColor: fade(theme.palette.common.white, 0.25),
+        },
+        marginRight: theme.spacing(2),
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: theme.spacing(3),
+            width: 'auto',
+        },
+    },
+    searchIcon: {
+        padding: theme.spacing(0, 2),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    inputRoot: {
+        color: 'inherit',
+    },
+    inputInput: {
+        padding: theme.spacing(1, 1, 1, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('md')]: {
+            width: '20ch',
+        },
+    }
 }));
 
 export default function Dashboard() {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(true);
-    const handleDrawerOpen = () => {
-        setOpen(true);
+    const [open, setOpen] = React.useState(false);
+    const [bugState, setBugState] = React.useState({
+        title: "",
+        assignedTo: "",
+        description: "",
+        status: ""
+    });
+    const [alert, setAlert] = React.useState({
+        message: "",
+        severity: "success"
+    });
+
+    const handleIssueSearch = (e, history) => {
+        if(e.key === "Enter"){
+            axios.get('/getIssue/'+e.target.value)
+                .then(response => {
+                    if(response.data.payload){
+                        history.push("/addBug");
+                        setBugState(response.data.payload);
+                        setAlert({...alert, message: ""});
+                    } else {
+                        setAlert({message: "Bug not found", severity: "error"});
+                        setBugState({
+                            title: "",
+                            assignedTo: "",
+                            description: "",
+                            status: ""
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
     };
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
+
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
@@ -144,7 +215,7 @@ export default function Dashboard() {
                             edge="start"
                             color="inherit"
                             aria-label="open drawer"
-                            onClick={handleDrawerOpen}
+                            onClick={() => setOpen(true)}
                             className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
                         >
                             <MenuIcon />
@@ -152,6 +223,24 @@ export default function Dashboard() {
                         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
                             Dashboard
                         </Typography>
+                        <div className={classes.grow} />
+                        <div className={classes.search}>
+                            <div className={classes.searchIcon}>
+                                <SearchIcon />
+                            </div>
+                            <Route render={({history}) => (
+                                <InputBase
+                                    placeholder="Bug Number"
+                                    classes={{
+                                        root: classes.inputRoot,
+                                        input: classes.inputInput,
+                                    }}
+                                    inputProps={{ 'aria-label': 'search' }}
+                                    onKeyPress={(e) => handleIssueSearch(e, history)}
+                                />
+                            )} />
+
+                        </div>
                         <IconButton color="inherit">
                             <Badge badgeContent={4} color="secondary">
                                 <NotificationsIcon />
@@ -170,7 +259,7 @@ export default function Dashboard() {
                     open={open}
                 >
                     <div className={classes.toolbarIcon}>
-                        <IconButton onClick={handleDrawerClose}>
+                        <IconButton onClick={() => setOpen(false)}>
                             <ChevronLeftIcon />
                         </IconButton>
                     </div>
@@ -187,11 +276,8 @@ export default function Dashboard() {
                                 <Route exact path="/dashboard">
                                     <Overview />
                                 </Route>
-                                <Route path="/addBug">
-                                    <AddBug />
-                                </Route>
-                                <Route path="/bugReport">
-                                    <BugReport />
+                                <Route path="/bugs">
+                                    <BugsForm state={bugState} setState={setBugState} alert={alert} setAlert={setAlert} />
                                 </Route>
                                 <Route path="/teams">
                                     <Teams />

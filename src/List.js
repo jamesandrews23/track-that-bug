@@ -16,17 +16,11 @@ export const mainListItems = (
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
             </ListItem>
-            <ListItem button component={Link} to={'/addBug'}>
+            <ListItem button component={Link} to={'/bugs'}>
                     <ListItemIcon>
-                        <NoteAddIcon />
+                        <BugReportIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Add Bug"/>
-            </ListItem>
-            <ListItem button component={Link} to={'/bugReport'}>
-                <ListItemIcon>
-                    <BugReportIcon />
-                </ListItemIcon>
-                <ListItemText primary="Bug Report" />
+                    <ListItemText primary="Bugs"/>
             </ListItem>
             <ListItem button component={Link} to={'/teams'}>
                 <ListItemIcon>

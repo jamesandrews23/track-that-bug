@@ -1,8 +1,9 @@
 package com.trackthatbug.trackthatbug.models;
 
-public class Result {
+public class Result<T> {
     private boolean error;
     private String message;
+    private T payload;
 
     public Result(){
         this.error = false;
@@ -22,5 +23,13 @@ public class Result {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public T getPayload() {
+        return payload;
+    }
+
+    public void setPayload(T payload) {
+        this.payload = payload;
     }
 }
