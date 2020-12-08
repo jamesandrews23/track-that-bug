@@ -10,7 +10,7 @@ import {Link} from "react-router-dom";
 
 export const mainListItems = (
     <div>
-            <ListItem button component={Link} to={'/dashboard'}>
+            <ListItem button component={Link} to={'/'}>
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>

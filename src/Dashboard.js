@@ -273,7 +273,7 @@ export default function Dashboard() {
                     <Container maxWidth="lg" className={classes.container}>
                         <Grid container spacing={3}>
                             <Switch>
-                                <Route exact path="/dashboard">
+                                <Route exact path="/">
                                     <Overview />
                                 </Route>
                                 <Route path="/bugs">

@@ -30,14 +30,9 @@ public class TrackthatbugApplication implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("login.html");
         registry.addViewController("/register").setViewName("register.html");
-        registry.addViewController("/dashboard").setViewName("dashboard.html");
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry
-                .addResourceHandler("/resources/**")
-                .addResourceLocations("/resources/");
+        registry.addViewController("/").setViewName("dashboard.html");
+        registry.addViewController("/bugs").setViewName("dashboard.html");
+        registry.addViewController("/teams").setViewName("dashboard.html");
     }
 
     @Override
