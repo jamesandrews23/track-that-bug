@@ -22,6 +22,7 @@ import java.security.Principal;
 import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 public class IssueController {
@@ -74,6 +75,13 @@ public class IssueController {
             result.setPayload(issue);
             result.setMessage("Issue found");
         }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/byUser")
+    public ResponseEntity<Result<List<Issue>>> retrieveBugsByUser(){
+        Result<List<Issue>> result = new Result<>();
+        result.setPayload(issueRepository.findAllBy("jamesandrews23"));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

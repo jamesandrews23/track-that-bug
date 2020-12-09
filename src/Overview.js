@@ -3,8 +3,13 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
+import DataCard from './components/DataCard.js';
+import YourBugs from './components/YourBugs.js';
 
 const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+    },
     fixedHeight: {
         height: 240,
     },
@@ -21,25 +26,18 @@ export default function Overview(){
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
-        <div>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-                <Paper className={fixedHeightPaper}>
-                    {/*<Chart />*/}
-                </Paper>
+        <Grid container className={classes.root} spacing={2}>
+            <Grid item xs={12} md={8} lg={4}>
+                <DataCard title="Your Bugs">
+                    <YourBugs />
+                </DataCard>
             </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-                <Paper className={fixedHeightPaper}>
-                    {/*<Deposits />*/}
-                </Paper>
+            <Grid item xs={12} md={4} lg={4}>
+                <DataCard title={"Fixed Bugs"} />
             </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                    {/*<Orders />*/}
-                </Paper>
+            <Grid item xs={12} md={4} lg={4}>
+                <DataCard title={"Pending Bugs"} />
             </Grid>
-        </div>
+        </Grid>
     );
 }

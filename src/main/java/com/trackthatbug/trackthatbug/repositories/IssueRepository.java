@@ -13,7 +13,7 @@ public interface IssueRepository extends PagingAndSortingRepository<Issue, Strin
     Issue findByIssueNumber(long issueNumber);
     Issue findByUser(String user);
     Issue findByAssignedTo(String assignedTo);
-    Issue findAllBy(String user);
+    List<Issue> findAllBy(String user);
     @Query("{ 'issueNumber' : ?0 }")
     List<Issue> findByIssue(String issueNumber);
 }

@@ -71,8 +71,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-
-
     @Override
     protected UserDetailsService userDetailsService() {
         return userDetailsService;
