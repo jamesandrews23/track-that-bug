@@ -4,10 +4,12 @@ import Link from '@material-ui/core/Link';
 import { useHistory } from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from "@material-ui/core/Grid";
+import {Typography} from "@material-ui/core";
 
 export default function YourBugs(props){
     const [userIssues, setUserIssues] = React.useState([]);
     const history = useHistory();
+    const [noBugs, setNoBugs] = React.useState(false);
 
     const runBugSearch = (issueNum) => {
         axios.get('/getIssue/'+issueNum)
@@ -35,7 +37,11 @@ export default function YourBugs(props){
         axios.get("/byUser", {}, )
             .then(rs => {
                 console.log(rs);
-                setUserIssues(rs.data.payload);
+                if(rs.data.payload && rs.data.payload.length > 0){
+                    setUserIssues(rs.data.payload);
+                } else {
+                    setNoBugs(true);
+                }
             })
     }
 
@@ -58,6 +64,17 @@ export default function YourBugs(props){
                             ))
                         }
                     </ul>
+                    : noBugs
+                    ? <Grid
+                        container
+                        direction="row"
+                        justify="center"
+                        alignItems="center"
+                    >
+                        <Typography>
+                            You do not have any bugs assigned to you.
+                        </Typography>
+                    </Grid>
                     : <Grid
                         container
                         direction="row"
