@@ -1,10 +1,14 @@
 import React, {useEffect} from 'react';
 import axios from 'axios';
-import Link from '@material-ui/core/Link';
 import { useHistory } from "react-router-dom";
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from "@material-ui/core/Grid";
 import {Typography} from "@material-ui/core";
+import List from "@material-ui/core/List";
+import BugReportIcon from "@material-ui/icons/BugReport";
+import ListItem from "@material-ui/core/ListItem";
+import IconButton from "@material-ui/core/IconButton";
+import ListItemText from "@material-ui/core/ListItemText";
 
 export default function YourBugs(props){
     const [userIssues, setUserIssues] = React.useState([]);
@@ -53,17 +57,20 @@ export default function YourBugs(props){
         <React.Fragment>
             {
                 userIssues.length > 0
-                    ? <ul>
+                    ? <List dense>
                         {
                             userIssues.map((issue) => (
-                                <React.Fragment>
-                                    <li>
-                                        <Link href={"#"} onClick={() => runBugSearch(issue.issueNumber)}>{issue.issueNumber}</Link>
-                                    </li>
-                                </React.Fragment>
+                                <ListItem>
+                                    <IconButton onClick={() => runBugSearch(issue.issueNumber)}>
+                                        <BugReportIcon />
+                                    </IconButton>
+                                    <ListItemText
+                                        primary={issue.issueNumber + " : " + issue.title}
+                                    />
+                                </ListItem>
                             ))
                         }
-                    </ul>
+                      </List>
                     : noBugs
                     ? <Grid
                         container

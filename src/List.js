@@ -5,7 +5,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import PeopleIcon from '@material-ui/icons/People';
 import BugReportIcon from '@material-ui/icons/BugReport';
-import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import {Link} from "react-router-dom";
 
 export const mainListItems = (
@@ -17,10 +16,10 @@ export const mainListItems = (
                 <ListItemText primary="Dashboard" />
             </ListItem>
             <ListItem button component={Link} to={'/bugs'}>
-                    <ListItemIcon>
-                        <BugReportIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Bugs"/>
+                <ListItemIcon>
+                    <BugReportIcon />
+                </ListItemIcon>
+                <ListItemText primary="Bugs"/>
             </ListItem>
             <ListItem button component={Link} to={'/teams'}>
                 <ListItemIcon>
