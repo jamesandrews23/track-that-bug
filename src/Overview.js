@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function Overview(){
+export default function Overview(props){
     const classes = useStyles();
     const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -29,7 +29,7 @@ export default function Overview(){
         <Grid container className={classes.root} spacing={2}>
             <Grid item xs={12} md={8} lg={4}>
                 <DataCard title="Your Bugs">
-                    <YourBugs />
+                    <YourBugs {...props} />
                 </DataCard>
             </Grid>
             <Grid item xs={12} md={4} lg={4}>

@@ -179,27 +179,31 @@ export default function Dashboard() {
         severity: "success"
     });
 
+    const runBugSearch = (issueNum) => {
+        axios.get('/getIssue/'+issueNum)
+            .then(response => {
+                if(response.data.payload){
+                    history.push("/addBug");
+                    setBugState(response.data.payload);
+                    setAlert({...alert, message: ""});
+                } else {
+                    setAlert({message: "Bug not found", severity: "error"});
+                    setBugState({
+                        title: "",
+                        assignedTo: "",
+                        description: "",
+                        status: ""
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     const handleIssueSearch = (e, history) => {
         if(e.key === "Enter"){
-            axios.get('/getIssue/'+e.target.value)
-                .then(response => {
-                    if(response.data.payload){
-                        history.push("/addBug");
-                        setBugState(response.data.payload);
-                        setAlert({...alert, message: ""});
-                    } else {
-                        setAlert({message: "Bug not found", severity: "error"});
-                        setBugState({
-                            title: "",
-                            assignedTo: "",
-                            description: "",
-                            status: ""
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            runBugSearch(e.target.value);
         }
     };
 
@@ -274,7 +278,7 @@ export default function Dashboard() {
                         <Grid container spacing={3}>
                             <Switch>
                                 <Route path="/dashboard">
-                                    <Overview />
+                                    <Overview setBugState={setBugState} setAlert={setAlert} />
                                 </Route>
                                 <Route path="/bugs">
                                     <BugsForm state={bugState} setState={setBugState} alert={alert} setAlert={setAlert} />
