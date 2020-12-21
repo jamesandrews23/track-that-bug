@@ -27,6 +27,8 @@ import Overview from './Overview';
 import InputBase from "@material-ui/core/InputBase";
 import SearchIcon from '@material-ui/icons/Search';
 import axios from 'axios';
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 // import Chart from './Chart';
 // import Deposits from './Deposits';
 // import Orders from './Orders';
@@ -162,7 +164,11 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up('md')]: {
             width: '20ch',
         },
-    }
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
 }));
 
 export default function Dashboard() {
@@ -178,10 +184,13 @@ export default function Dashboard() {
         message: "",
         severity: "success"
     });
+    const [backdropOpen, setBackdropOpen] = React.useState(false);
 
     const runBugSearch = (issueNum) => {
+        setBackdropOpen(true);
         axios.get('/getIssue/'+issueNum)
             .then(response => {
+                setBackdropOpen(false);
                 if(response.data.payload){
                     history.push("/addBug");
                     setBugState(response.data.payload);
@@ -197,6 +206,7 @@ export default function Dashboard() {
                 }
             })
             .catch(error => {
+                setBackdropOpen(false);
                 console.log(error);
             });
     }
@@ -212,6 +222,9 @@ export default function Dashboard() {
     return (
         <Router>
             <div className={classes.root}>
+                <Backdrop className={classes.backdrop} open={backdropOpen} onClick={() => setBackdropOpen(false)}>
+                    <CircularProgress color="inherit" />
+                </Backdrop>
                 <CssBaseline />
                 <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
                     <Toolbar className={classes.toolbar}>
@@ -278,7 +291,7 @@ export default function Dashboard() {
                         <Grid container spacing={3}>
                             <Switch>
                                 <Route path="/dashboard">
-                                    <Overview setBugState={setBugState} setAlert={setAlert} />
+                                    <Overview setBugState={setBugState} setAlert={setAlert} setBackdropOpen={setBackdropOpen} />
                                 </Route>
                                 <Route path="/bugs">
                                     <BugsForm state={bugState} setState={setBugState} alert={alert} setAlert={setAlert} />

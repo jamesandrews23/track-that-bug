@@ -16,8 +16,10 @@ export default function YourBugs(props){
     const [noBugs, setNoBugs] = React.useState(false);
 
     const runBugSearch = (issueNum) => {
+        props.setBackdropOpen(true);
         axios.get('/getIssue/'+issueNum)
             .then(response => {
+                props.setBackdropOpen(false);
                 if(response.data.payload){
                     history.push("/bugs");
                     props.setBugState(response.data.payload);
@@ -33,6 +35,7 @@ export default function YourBugs(props){
                 }
             })
             .catch(error => {
+                props.setBackdropOpen(false);
                 console.log(error);
             });
     }
