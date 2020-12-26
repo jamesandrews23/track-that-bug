@@ -14,6 +14,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
 import Alert from "@material-ui/lab/Alert";
+import * as yup from 'yup';
+import {useFormik} from 'formik';
 
 function Copyright() {
     return (
@@ -55,19 +57,39 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const validationSchema = yup.object({
+    username: yup
+        .string('Enter your username')
+        .required('Username is required'),
+    password: yup
+        .string('Enter your password')
+        .required('Password is required'),
+});
+
 export default function Login() {
     const classes = useStyles();
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [error, setError] = React.useState(false);
 
-    const handleLogin = function (e){
-        e.preventDefault();
-        // let formData = new FormData(e.target);
+    const formik = useFormik({
+        initialValues: {
+            username: '',
+            password: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            handleLogin(values);
+        },
+    });
 
+    const handleLogin = function (values){
         let formData = new FormData();
-        formData.append("username", username);
-        formData.append("password", password);
+        // formData.append("username", username);
+        // formData.append("password", password);
+
+        formData.append("username", values.username);
+        formData.append("password", values.password);
 
         axios.post("/performLogin",
             formData,
@@ -96,7 +118,7 @@ export default function Login() {
                     Sign in
                 </Typography>
                 {error && <div className={classes.root}><Alert severity="error">Wrong username or password</Alert></div>}
-                <form onSubmit={handleLogin} className={classes.form} noValidate>
+                <form onSubmit={formik.handleSubmit} className={classes.form} noValidate>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -107,8 +129,10 @@ export default function Login() {
                         name="username"
                         autoComplete="username"
                         autoFocus
-                        onChange={e => {setUsername(e.target.value)}}
-                        value={username}
+                        value={formik.values.username}
+                        onChange={formik.handleChange}
+                        error={formik.touched.username && Boolean(formik.errors.username)}
+                        helperText={formik.touched.username && formik.errors.username}
                     />
                     <TextField
                         variant="outlined"
@@ -120,8 +144,10 @@ export default function Login() {
                         type="password"
                         id="password"
                         autoComplete="current-password"
-                        onChange={e => {setPassword(e.target.value)}}
-                        value={password}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
                     />
                     <FormControlLabel
                         control={<Checkbox value="remember" color="primary" />}
