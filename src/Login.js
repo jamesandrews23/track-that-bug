@@ -97,8 +97,10 @@ export default function Login() {
                 headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
             })
             .then((response) => {
-                if(response.request.responseURL){
+                if(!response.request.responseURL.includes('error')){
                     window.location = response.request.responseURL;
+                } else {
+                    setError(true);
                 }
             })
             .catch(error => {
@@ -117,7 +119,7 @@ export default function Login() {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                {error && <div className={classes.root}><Alert severity="error">Wrong username or password</Alert></div>}
+                {error && <div className={classes.root}><Alert severity="error">Invalid username/password combination.</Alert></div>}
                 <form onSubmit={formik.handleSubmit} className={classes.form} noValidate>
                     <TextField
                         variant="outlined"
