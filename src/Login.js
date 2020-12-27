@@ -16,6 +16,7 @@ import axios from 'axios';
 import Alert from "@material-ui/lab/Alert";
 import * as yup from 'yup';
 import {useFormik} from 'formik';
+import LoadingButton from './components/LoadingButton';
 
 function Copyright() {
     return (
@@ -45,10 +46,6 @@ const useStyles = makeStyles((theme) => ({
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing(1),
     },
-    submit: {
-        margin: theme.spacing(3, 0, 2),
-    },
-
     root: {
         width: '100%',
         '& > * + *': {
@@ -68,9 +65,9 @@ const validationSchema = yup.object({
 
 export default function Login() {
     const classes = useStyles();
-    const [username, setUsername] = React.useState("");
-    const [password, setPassword] = React.useState("");
     const [error, setError] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
+
 
     const formik = useFormik({
         initialValues: {
@@ -84,6 +81,7 @@ export default function Login() {
     });
 
     const handleLogin = function (values){
+        setLoading(true);
         let formData = new FormData();
         // formData.append("username", username);
         // formData.append("password", password);
@@ -97,6 +95,7 @@ export default function Login() {
                 headers: {'Content-Type' : 'application/x-www-form-urlencoded'}
             })
             .then((response) => {
+                setLoading(false);
                 if(!response.request.responseURL.includes('error')){
                     window.location = response.request.responseURL;
                 } else {
@@ -104,6 +103,7 @@ export default function Login() {
                 }
             })
             .catch(error => {
+                setLoading(false);
                 console.log(error);
                 setError(true);
             });
@@ -155,15 +155,15 @@ export default function Login() {
                         control={<Checkbox value="remember" color="primary" />}
                         label="Remember me"
                     />
-                    <Button
+                    <LoadingButton
                         type="submit"
-                        fullWidth
+                        fullWidth={true}
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        loading={loading}
                     >
                         Sign In
-                    </Button>
+                    </LoadingButton>
                     <Grid container>
                         <Grid item xs>
                             <Link href="#" variant="body2">
