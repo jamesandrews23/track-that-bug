@@ -14,6 +14,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Alert from "@material-ui/lab/Alert";
 import axios from "axios";
+import * as yup from 'yup';
+import {useFormik} from 'formik';
 
 function Copyright() {
     return (
@@ -54,36 +56,67 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const validate = values => {
+    const errors = {};
+    if(values.password !== values.confirmPassword){
+        errors.confirmPassword = 'Does not match password';
+    }
+    return errors;
+}
+
+const validationSchema = yup.object({
+    firstName: yup
+        .string('Enter your first name')
+        .required('First name is required'),
+    lastName: yup
+        .string('Enter your last name')
+        .required('Last name is required'),
+    email: yup
+        .string('Enter your email address')
+        .email('Invalid email')
+        .required('Email address is required'),
+    username: yup
+        .string('Enter your username')
+        .required('Username is required'),
+    password: yup
+        .string('Enter your password')
+        .min(8, 'Minimum of 8 characters are required')
+        .required('Password is required'),
+    confirmPassword: yup
+        .string('Confirm password')
+        .min(8, 'Minimum of 8 characters are required')
+        .required('Confirm password is required')
+});
+
 export default function Register() {
     const classes = useStyles();
     const [error, setError] = React.useState(false);
-    const [firstName, setFirstName] = React.useState("");
-    const [lastName, setLastName] = React.useState("");
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
-    const [confirmPassword, setConfirmPassword] = React.useState("");
-    const [username, setUsername] = React.useState("");
 
+    const formik = useFormik({
+        initialValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            username: '',
+            password: '',
+            confirmPassword: ''
+        },
+        validate,
+        validationSchema: validationSchema,
+        onSubmit: (values) => {
+            handleRegister(values);
+        },
+    });
 
-    const handleRegister = function(e){
-        e.preventDefault();
-
-        // let formData = new FormData();
-        //
-        // formData.append("firstName", firstName);
-        // formData.append("lastName", lastName);
-        // formData.append("email", email);
-        // formData.append("password", password);
-        // formData.append("confirmPassword", confirmPassword);
-        // formData.append("username", username);
+    const handleRegister = function(values){
 
         let data = {
-            "firstName" : firstName,
-            "lastName" : lastName,
-            "email" : email,
-            "username" : username,
-            "password" : password,
-            "confirmPassword" : confirmPassword
+            "firstName" : values.firstName,
+            "lastName" : values.lastName,
+            "email" : values.email,
+            "username" : values.username,
+            "password" : values.password,
+            "confirmPassword" : values.confirmPassword
         }
 
         axios.post("/registerUser",
@@ -116,7 +149,7 @@ export default function Register() {
                     Sign up
                 </Typography>
                 {error && <div className={classes.root}><Alert severity="error">User not created</Alert></div>}
-                <form className={classes.form} noValidate onSubmit={handleRegister}>
+                <form className={classes.form} noValidate onSubmit={formik.handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -128,8 +161,10 @@ export default function Register() {
                                 id="firstName"
                                 label="First Name"
                                 autoFocus
-                                onChange={e => {setFirstName(e.target.value)}}
-                                value={firstName}
+                                value={formik.values.firstName}
+                                onChange={formik.handleChange}
+                                error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                                helperText={formik.touched.firstName && formik.errors.firstName}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -141,8 +176,10 @@ export default function Register() {
                                 label="Last Name"
                                 name="lastName"
                                 autoComplete="lname"
-                                onChange={e => setLastName(e.target.value)}
-                                value={lastName}
+                                value={formik.values.lastName}
+                                onChange={formik.handleChange}
+                                error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                                helperText={formik.touched.lastName && formik.errors.lastName}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -154,8 +191,10 @@ export default function Register() {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
-                                onChange={e => setEmail(e.target.value)}
-                                value={email}
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                                helperText={formik.touched.email && formik.errors.email}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -167,8 +206,10 @@ export default function Register() {
                                 label="Username"
                                 name="username"
                                 autoComplete="username"
-                                onChange={e => setUsername(e.target.value)}
-                                value={username}
+                                value={formik.values.username}
+                                onChange={formik.handleChange}
+                                error={formik.touched.username && Boolean(formik.errors.username)}
+                                helperText={formik.touched.username && formik.errors.username}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -181,8 +222,10 @@ export default function Register() {
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
-                                onChange={e => setPassword(e.target.value)}
-                                value={password}
+                                value={formik.values.password}
+                                onChange={formik.handleChange}
+                                error={formik.touched.password && Boolean(formik.errors.password)}
+                                helperText={formik.touched.password && formik.errors.password}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -194,8 +237,10 @@ export default function Register() {
                                 label="Confirm Password"
                                 type="password"
                                 id="confirmPassword"
-                                onChange={e => setConfirmPassword(e.target.value)}
-                                value={confirmPassword}
+                                value={formik.values.confirmPassword}
+                                onChange={formik.handleChange}
+                                error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                                helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                             />
                         </Grid>
                         <Grid item xs={12}>
