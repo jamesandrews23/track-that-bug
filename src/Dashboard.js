@@ -238,7 +238,7 @@ export default function Dashboard() {
                             <MenuIcon />
                         </IconButton>
                         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-                            Dashboard
+                            Dashboard theirs
                         </Typography>
                         <div className={classes.grow} />
                         <div className={classes.search}>

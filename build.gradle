@@ -33,7 +33,7 @@ task webpack(type: Exec) {
 	inputs.dir("src").withPathSensitivity(PathSensitivity.RELATIVE)
 	outputs.dir("$buildDir/resources/main/static/js")
 	outputs.cacheIf { true }
-	commandLine "$projectDir/node_modules/.bin/webpack.cmd", "--config webpack.config.js"
+	commandLine "$projectDir/node_modules/.bin/webpack.cmd"
 }
 
 dependencyManagement {
@@ -46,4 +46,4 @@ test {
 	useJUnitPlatform()
 }
 
-tasks.findByName("build").dependsOn(webpack)
+build.dependsOn webpack

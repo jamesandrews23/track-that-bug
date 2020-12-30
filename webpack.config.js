@@ -1,29 +1,63 @@
 const path = require("path");
+const webpack = require("webpack");
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
+    devServer: {
+        port: 8081,
+        contentBase: path.resolve(__dirname, "./src/main/resources/public/"),
+        proxy: {
+            '/**' : {
+                target: 'http://localhost:8080',
+                secure: false,
+                prependPath: false
+            }
+        },
+        historyApiFallback: true,
+        allowedHosts: [
+            'http://localhost:8080'
+        ],
+        hot: true,
+        inline: true,
+        watchContentBase: true
+    },
     mode: "development",
     devtool: "eval-source-map",
     entry: "./src/index.js",
     output: {
-        // publicPath: '/xvr/ui/admin',
-        filename: "index.js",
-        path: path.resolve(__dirname, "build/resources/main/static/js")
+        path: __dirname,
+        publicPath: "/build/resources/main/static/js/",
+        filename: "./build/resources/main/static/js/index.js"
     },
     plugins: [
         // new CleanWebpackPlugin(),
         // new HtmlWebpackPlugin({
         //     template: './xvr/admin/src/assets/index.html'
         // })
+        new webpack.HotModuleReplacementPlugin({
+            // Options...
+        })
     ],
     module: {
         rules: [
             {
-                test: /\.js$/,
-                exclude: /node_modules/,
+                test: /\.m?js$/,
+                exclude: [
+                    /node_modules/,
+                    /node_modules[\\]/,
+                    /node_modules[\\/]core-js/,
+                    /node_modules[\\/]webpack[\\/]buildin/,
+                    /node_modules[\\/]webpack/,
+                ],
                 use: {
-                    loader: "babel-loader"
+                    loader: "babel-loader",
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', { targets: "defaults" }]
+                        ],
+                        plugins: ['@babel/plugin-proposal-class-properties']
+                    }
                 }
             }
             // {
