@@ -16,6 +16,7 @@ import Alert from "@material-ui/lab/Alert";
 import axios from "axios";
 import * as yup from 'yup';
 import {useFormik} from 'formik';
+import LoadingButton from "./components/LoadingButton";
 
 function Copyright() {
     return (
@@ -91,6 +92,7 @@ const validationSchema = yup.object({
 export default function Register() {
     const classes = useStyles();
     const [error, setError] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -109,6 +111,7 @@ export default function Register() {
     });
 
     const handleRegister = function(values){
+        setLoading(true);
 
         let data = {
             "firstName" : values.firstName,
@@ -128,12 +131,14 @@ export default function Register() {
                 }
             })
             .then(response => {
+                setLoading(false);
                 if(response.data.error){
                     setError(true);
                 }
                 console.log(response);
             })
             .catch(error => {
+                setLoading(false);
                 setError(true);
             })
     }
@@ -243,22 +248,23 @@ export default function Register() {
                                 helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <FormControlLabel
-                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                label="I want to receive inspiration, marketing promotions and updates via email."
-                            />
-                        </Grid>
+                        {/*<Grid item xs={12}>*/}
+                        {/*    <FormControlLabel*/}
+                        {/*        control={<Checkbox value="allowExtraEmails" color="primary" />}*/}
+                        {/*        label="I want to receive inspiration, marketing promotions and updates via email."*/}
+                        {/*    />*/}
+                        {/*</Grid>*/}
                     </Grid>
-                    <Button
+                    <LoadingButton
                         type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
                         className={classes.submit}
+                        loading={loading}
                     >
                         Sign Up
-                    </Button>
+                    </LoadingButton>
                     <Grid container justify="flex-end">
                         <Grid item>
                             <Link href="/login" variant="body2">
