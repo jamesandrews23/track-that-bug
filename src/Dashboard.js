@@ -13,12 +13,11 @@ import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import { mainListItems, secondaryListItems } from './List';
+import MainListItems from './List';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import BugsForm from "./BugsForm";
@@ -29,9 +28,6 @@ import SearchIcon from '@material-ui/icons/Search';
 import axios from 'axios';
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
-// import Chart from './Chart';
-// import Deposits from './Deposits';
-// import Orders from './Orders';
 
 function Copyright() {
     return (
@@ -281,9 +277,8 @@ export default function Dashboard() {
                         </IconButton>
                     </div>
                     <Divider />
-                    <List>{mainListItems}</List>
+                    <List><MainListItems /></List>
                     <Divider />
-                    <List>{secondaryListItems}</List>
                 </Drawer>
                 <main className={classes.content}>
                     <div className={classes.appBarSpacer} />
