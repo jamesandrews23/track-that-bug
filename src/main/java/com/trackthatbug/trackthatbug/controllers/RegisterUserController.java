@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.controllers;
 
+import com.trackthatbug.trackthatbug.models.RegisterUserResponse;
 import com.trackthatbug.trackthatbug.models.Result;
 import com.trackthatbug.trackthatbug.models.User;
 import com.trackthatbug.trackthatbug.repositories.UserRepository;
@@ -20,10 +21,12 @@ public class RegisterUserController {
 
     @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping(value = "/registerUser", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Result> registerUser(@RequestBody @Valid User user, BindingResult result){
-        Result registerUserResult = new Result();
+    public ResponseEntity<Result<RegisterUserResponse>> registerUser(@RequestBody @Valid User user, BindingResult result){
+        Result<RegisterUserResponse> registerUserResult = new Result<>();
+        registerUserResult.setPayload(new RegisterUserResponse());
         if(result.hasErrors()){
             registerUserResult.setError(true);
+            registerUserResult.getPayload().setConfirmationMessage("Validation error occurred");
             return new ResponseEntity<>(registerUserResult, HttpStatus.OK);
         }
 
@@ -33,12 +36,14 @@ public class RegisterUserController {
             //add user
             try {
                 userDetailsService.saveUser(user);
+                registerUserResult.getPayload().setConfirmationMessage("New user " + user.getUsername() + " created.");
             } catch(Exception e){
                 registerUserResult.setError(true);
             }
         } else {
             //show error
             registerUserResult.setError(true);
+            registerUserResult.getPayload().setConfirmationMessage("Username unavailable");
         }
 
         return new ResponseEntity<>(registerUserResult, HttpStatus.OK);

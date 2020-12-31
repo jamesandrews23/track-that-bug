@@ -91,8 +91,9 @@ const validationSchema = yup.object({
 
 export default function Register() {
     const classes = useStyles();
-    const [error, setError] = React.useState(false);
+    const [status, setStatus] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const [error, setError] = React.useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -132,14 +133,13 @@ export default function Register() {
             })
             .then(response => {
                 setLoading(false);
-                if(response.data.error){
-                    setError(true);
-                }
-                console.log(response);
+                setError(response.data.error);
+                setStatus(response.data.payload.confirmationMessage);
             })
             .catch(error => {
                 setLoading(false);
                 setError(true);
+                setStatus("An error has occurred. Please try again later.");
             })
     }
 
@@ -153,7 +153,14 @@ export default function Register() {
                 <Typography component="h1" variant="h5">
                     Sign up
                 </Typography>
-                {error && <div className={classes.root}><Alert severity="error">User not created</Alert></div>}
+                {
+                    status !== ''
+                        && <div className={classes.root}>
+                            <Alert severity={error ? "error" : "success"}>
+                                {status} {!error && <Link href="/login" variant="body2">Sign in</Link>}
+                            </Alert>
+                        </div>
+                }
                 <form className={classes.form} noValidate onSubmit={formik.handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
