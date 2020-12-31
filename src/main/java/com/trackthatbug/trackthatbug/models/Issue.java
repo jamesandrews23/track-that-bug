@@ -31,6 +31,9 @@ public class Issue {
 
     public Issue() {
         this.status = Status.OPEN;
+        this.assignedTo = "";
+        this.description = "";
+        this.title = "";
     }
 
     public String getId() {
