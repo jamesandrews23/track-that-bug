@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.Binary;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -10,6 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Document(collection = "issues")
 public class Issue {
@@ -26,14 +29,20 @@ public class Issue {
     @CreatedDate
     private Date createdOn;
     //todo @LastModifiedDate add a field for the last modified date
-    private Binary file;
-    private File attachment;
+
+    private String fileName;
+    @JsonIgnore
+    private Binary attachment;
+    private String lastModifiedBy;
+    private Date lastModifiedDate;
+    private String pathToAttachment;
 
     public Issue() {
         this.status = Status.OPEN;
         this.assignedTo = "";
         this.description = "";
         this.title = "";
+        this.lastModifiedBy = "";
     }
 
     public String getId() {
@@ -117,19 +126,43 @@ public class Issue {
         this.status = status;
     }
 
-    public Binary getFile() {
-        return file;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setFile(Binary file) {
-        this.file = file;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public File getAttachment() {
+    public Binary getAttachment() {
         return attachment;
     }
 
-    public void setAttachment(File attachment) {
+    public void setAttachment(Binary attachment) {
         this.attachment = attachment;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getPathToAttachment() {
+        return pathToAttachment;
+    }
+
+    public void setPathToAttachment(String pathToAttachment) {
+        this.pathToAttachment = pathToAttachment;
     }
 }

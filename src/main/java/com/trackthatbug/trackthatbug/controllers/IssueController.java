@@ -14,13 +14,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.*;
+import java.nio.file.*;
 import java.security.Principal;
-import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
@@ -28,12 +25,14 @@ import java.util.List;
 public class IssueController {
     private IssueRepository issueRepository;
     private NextSequenceService nextSequenceService;
+    private static final String BUILD_DIR = "\\build\\resources\\main\\public\\";
 
-    @CrossOrigin(origins = "http://localhost:8080")
-    @PostMapping(value = "/createIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Result<Issue>> createIssue(@RequestPart("properties") @Valid Issue issue,
-                                              @RequestPart("files") MultipartFile[] files, BindingResult bindingResult, Principal principal){
-        Result<Issue> createdIssue = new Result<Issue>();
+    @PatchMapping(value = "/saveIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Result<Issue>> createIssue(
+                @RequestPart("properties") @Valid Issue issue,
+                @RequestPart("files") MultipartFile[] files,
+                BindingResult bindingResult, Principal principal){
+        Result<Issue> createdIssue = new Result<>();
         String user = principal.getName();
         issue.setUser(user);
         issue.setCreatedBy(user);
@@ -42,7 +41,9 @@ public class IssueController {
 
         if(files.length > 0){
             try {
-                issue.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+                //issue.getAttachments().put(files[0].getOriginalFilename(), new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+                issue.setFileName(files[0].getOriginalFilename());
+                issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
             } catch(IOException e){
                 //if file fails to load show error
                 createdIssue.setPayload(issue);
@@ -56,32 +57,63 @@ public class IssueController {
         return new ResponseEntity<>(createdIssue, HttpStatus.OK);
     }
 
+    @PatchMapping(value = "/modifyIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Result<Issue>> modifyIssue(
+            @RequestPart("properties") @Valid Issue issue,
+            @RequestPart("files") MultipartFile[] files,
+            BindingResult bindingResult, Principal principal){
+        Result<Issue> modifiedIssue = new Result<>();
+        String user = principal.getName();
+        issue.setUser(user);
+        issue.setLastModifiedBy(user);
+        issue.setLastModifiedDate(new Date());
+
+//        if(files.length > 0){
+//            try {
+//                issue.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+//            } catch(IOException e){
+//                //if file fails to load show error
+//                modifiedIssue.setPayload(issue);
+//                return new ResponseEntity<>(modifiedIssue, HttpStatus.BAD_REQUEST);
+//            }
+//        }
+
+        issueRepository.save(issue);
+
+        modifiedIssue.setPayload(issue);
+        return new ResponseEntity<>(modifiedIssue, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/getIssue/{id}")
     public ResponseEntity<Result<Issue>> getIssue(@PathVariable("id") String issueNumber){
         Result<Issue> result = new Result<>();
         Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNumber));
-        File file = new File("Capture.png");
-        if(issue != null){
-            try (FileOutputStream fileOutputStream = new FileOutputStream(file)){
-                fileOutputStream.write(issue.getFile().getData());
-                FileDescriptor fileDescriptor = fileOutputStream.getFD();
 
-                System.out.println("stop");
-            } catch(Exception e){
-                System.out.println("Failed to write file");
+
+        if(issue != null){
+            try {
+                Path path = Files.write(Paths.get(System.getProperty("user.dir") + BUILD_DIR + issue.getFileName()), issue.getAttachment().getData());
+                path.toAbsolutePath();
+                issue.setPathToAttachment("/" + issue.getFileName());
+//                for(Map.Entry<String, Binary> entry : issue.getAttachments().entrySet()){
+//                    Path path = Files.write(Paths.get(entry.getKey()), entry.getValue().getData());
+//                    issue.setAttachment(path.toString());
+//                }
+            } catch (IOException io){
+                io.printStackTrace();
             }
 
-            issue.setAttachment(file);
+
             result.setPayload(issue);
-            result.setMessage("Issue found");
         }
+
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/byUser")
-    public ResponseEntity<Result<List<Issue>>> retrieveBugsByUser(){
+    public ResponseEntity<Result<List<Issue>>> retrieveBugsByUser(Principal principal){
         Result<List<Issue>> result = new Result<>();
-        result.setPayload(issueRepository.findAllBy("jamesandrews23"));
+        result.setPayload(issueRepository.findAllBy(principal.getName()));
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

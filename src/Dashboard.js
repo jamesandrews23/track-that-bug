@@ -174,7 +174,9 @@ export default function Dashboard() {
         title: "",
         assignedTo: "",
         description: "",
-        status: ""
+        status: "",
+        lastModifiedBy: "",
+        lastModifiedDate: "",
     });
     const [alert, setAlert] = React.useState({
         message: "",
@@ -197,7 +199,9 @@ export default function Dashboard() {
                         title: "",
                         assignedTo: "",
                         description: "",
-                        status: ""
+                        status: "",
+                        lastModifiedBy: "",
+                        lastModifiedDate: "",
                     });
                 }
             })

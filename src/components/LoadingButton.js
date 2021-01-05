@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
     },
     wrapper: {
-        margin: theme.spacing(3, 0, 2),
+        margin: theme.spacing(0, 1, 0, 0),
         position: 'relative',
     },
     // buttonSuccess: {
@@ -38,19 +38,15 @@ export default function LoadingButton(props){
     // });
 
     return (
-        <div className={classes.wrapper}>
+        <span className={classes.wrapper}>
             <Button
-                variant={props.variant}
-                color={props.color}
-                className={props.className}
+                {...props}
                 disabled={props.loading}
-                onClick={props.handleButtonClick}
-                type={props.type}
-                fullWidth={props.fullWidth}
+                onClick={props.onClick}
             >
                 {props.children}
             </Button>
             {props.loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-        </div>
+        </span>
     )
 }

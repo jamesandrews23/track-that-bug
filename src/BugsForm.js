@@ -4,15 +4,18 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import axios from "axios";
-import {DropzoneArea} from "material-ui-dropzone";
+import {DropzoneDialog} from "material-ui-dropzone";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Alert from "@material-ui/lab/Alert";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import green from "@material-ui/core/colors/green";
-import _ from 'lodash';
+import LoadingButton from "./components/LoadingButton";
+import Link from "@material-ui/core/Link";
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import SaveIcon from '@material-ui/icons/Save';
+import EditIcon from '@material-ui/icons/Edit';
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -56,21 +59,11 @@ const useStyles = makeStyles((theme) => ({
 export default function BugsForm(props){
     const classes = useStyles();
     const [loading, setLoading] = React.useState(false);
-
-
+    const [modifyLoading, setModifyLoading] = React.useState(false);
     const [files, setFiles] = React.useState();
+    const [openAttachFile, setOpenAttachFile] = React.useState(false);
 
-    const handleChange = (event) => {
-        let value = event.target.value;
-        let name = event.target.name;
-
-        props.setState({...props.state, [name] : value});
-    };
-
-    const handleCreateIssue = function(e){
-        e.preventDefault();
-        setLoading(true);
-
+    const getForm = () => {
         let form = new FormData();
 
         form.append("properties", new Blob([JSON.stringify(props.state)], {
@@ -78,10 +71,26 @@ export default function BugsForm(props){
         }));
 
         files.forEach(file =>{
-           form.append("files", file, file.name);
+            form.append("files", file, file.name);
         });
 
-        axios.post('/createIssue',
+        return form;
+    };
+
+    const handleChange = event => {
+        let value = event.target.value;
+        let name = event.target.name;
+
+        props.setState({...props.state, [name] : value});
+    };
+
+    const handleCreateIssue = e => {
+        e.preventDefault();
+        setLoading(true);
+
+        let form = getForm();
+
+        axios.patch('/saveIssue',
             form,
             {
                 headers: {
@@ -102,10 +111,39 @@ export default function BugsForm(props){
                     severity: "error"
                 })
             });
-    }
+    };
+
+    const handleModifyIssue = e => {
+        e.preventDefault();
+        setModifyLoading(true);
+
+        let form = getForm();
+
+        axios.patch('/modifyIssue',
+            form,
+            {
+                headers: {
+                    'Content-Type' : undefined
+                }
+            })
+            .then(response => {
+                setModifyLoading(false);
+                props.setAlert({
+                    message: "Bug " + response.data.payload.issueNumber + " modified successfully.",
+                    severity: "success"
+                })
+            })
+            .catch(error => {
+                setModifyLoading(false);
+                props.setAlert({
+                    message: "An error has occurred. " + error.message,
+                    severity: "error"
+                })
+            });
+    };
 
     return (
-        <form className={classes.form} noValidate onSubmit={handleCreateIssue}>
+        <form className={classes.form} noValidate>
             {props.alert.message &&
                 <div className={classes.alert}>
                     <Alert
@@ -116,6 +154,41 @@ export default function BugsForm(props){
                 </div>
             }
             <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    <LoadingButton
+                        variant="contained"
+                        color="primary"
+                        loading={loading}
+                        onClick={handleCreateIssue}
+                        startIcon={<SaveIcon />}
+                    >
+                        Save
+                    </LoadingButton>
+                    <LoadingButton
+                        variant="contained"
+                        color="primary"
+                        loading={modifyLoading}
+                        onClick={handleModifyIssue}
+                        startIcon={<EditIcon />}
+                    >
+                        Modify
+                    </LoadingButton>
+                    <Button
+                        variant={"contained"}
+                        color={"primary"}
+                        onClick={() => setOpenAttachFile(true)}
+                        startIcon={<AttachFileIcon />}
+                    >
+                        Attach File
+                    </Button>
+                    <Button
+                        style={{float: "right"}}
+                        variant="contained"
+                        color="primary"
+                    >
+                        Clear
+                    </Button>
+                </Grid>
                 <Grid item xs={6}>
                     <TextField
                         autoComplete="off"
@@ -146,6 +219,19 @@ export default function BugsForm(props){
                             <MenuItem value="james">James</MenuItem>
                         </Select>
                     </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        autoComplete="off"
+                        name="description"
+                        variant="outlined"
+                        required
+                        fullWidth
+                        id="description"
+                        label="Description"
+                        onChange={handleChange}
+                        value={props.state.description}
+                    />
                     <FormControl variant="outlined" className={classes.formControl}>
                         <InputLabel id="status">Status</InputLabel>
                         <Select
@@ -168,40 +254,41 @@ export default function BugsForm(props){
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                     <TextField
                         autoComplete="off"
-                        name="description"
+                        name="comments"
                         variant="outlined"
-                        required
                         fullWidth
-                        id="description"
-                        label="Description"
+                        id="comments"
+                        label="Comments"
                         onChange={handleChange}
-                        value={props.state.description}
+                        value={props.state.comments}
                         multiline
-                        rows={10}
+                        rows={4}
+                        className={classes.formControl}
                     />
+                    {
+                        props.state.pathToAttachment
+                            && <Link href={props.state.pathToAttachment}>{props.state.pathToAttachment}</Link>
+                    }
                 </Grid>
                 <Grid item xs={12}>
-                    <DropzoneArea
-                        onChange={(files) => setFiles(files)}
+                    <DropzoneDialog
+                        cancelButtonText={"cancel"}
+                        submitButtonText={"submit"}
+                        maxFileSize={128000}
+                        open={openAttachFile}
+                        onClose={() => setOpenAttachFile(false)}
+                        onSave={(files) => {
+                            setFiles(files)
+                            setOpenAttachFile(false);
+                        }}
+                        showPreviews={true}
+                        showFileNamesInPreview={true}
                     />
                 </Grid>
             </Grid>
-            <div className={classes.wrapper}>
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    disabled={loading}
-                >
-                    Add Bug
-                </Button>
-                {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
-            </div>
         </form>
     );
 }
