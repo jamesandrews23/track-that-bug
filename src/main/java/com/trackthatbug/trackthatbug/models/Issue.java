@@ -10,9 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.File;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Document(collection = "issues")
 public class Issue {
@@ -36,6 +34,8 @@ public class Issue {
     private String lastModifiedBy;
     private Date lastModifiedDate;
     private String pathToAttachment;
+    private String comment;
+    private List<Comment> comments;
 
     public Issue() {
         this.status = Status.OPEN;
@@ -43,6 +43,7 @@ public class Issue {
         this.description = "";
         this.title = "";
         this.lastModifiedBy = "";
+        this.comments = new ArrayList<>();
     }
 
     public String getId() {
@@ -164,5 +165,21 @@ public class Issue {
 
     public void setPathToAttachment(String pathToAttachment) {
         this.pathToAttachment = pathToAttachment;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

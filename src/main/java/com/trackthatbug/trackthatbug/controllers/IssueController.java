@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.controllers;
 
+import com.trackthatbug.trackthatbug.models.Comment;
 import com.trackthatbug.trackthatbug.models.Issue;
 import com.trackthatbug.trackthatbug.models.Result;
 import com.trackthatbug.trackthatbug.repositories.IssueRepository;
@@ -51,6 +52,10 @@ public class IssueController {
             }
         }
 
+        if(issue.getComment() != null && issue.getComment() != ""){
+            issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
+        }
+
         issueRepository.save(issue);
 
         createdIssue.setPayload(issue);
@@ -92,17 +97,13 @@ public class IssueController {
 
         if(issue != null){
             try {
-                Path path = Files.write(Paths.get(System.getProperty("user.dir") + BUILD_DIR + issue.getFileName()), issue.getAttachment().getData());
-                path.toAbsolutePath();
-                issue.setPathToAttachment("/" + issue.getFileName());
-//                for(Map.Entry<String, Binary> entry : issue.getAttachments().entrySet()){
-//                    Path path = Files.write(Paths.get(entry.getKey()), entry.getValue().getData());
-//                    issue.setAttachment(path.toString());
-//                }
+                if(issue.getFileName() != null && issue.getAttachment() != null){
+                    Files.write(Paths.get(System.getProperty("user.dir") + BUILD_DIR + issue.getFileName()), issue.getAttachment().getData());
+                    issue.setPathToAttachment("/" + issue.getFileName());
+                }
             } catch (IOException io){
                 io.printStackTrace();
             }
-
 
             result.setPayload(issue);
         }

@@ -16,6 +16,7 @@ import Link from "@material-ui/core/Link";
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import SaveIcon from '@material-ui/icons/Save';
 import EditIcon from '@material-ui/icons/Edit';
+import CommentCard from "./components/CommentCard";
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -70,9 +71,11 @@ export default function BugsForm(props){
             type: "application/json"
         }));
 
-        files.forEach(file =>{
-            form.append("files", file, file.name);
-        });
+        if(files){
+            files.forEach(file =>{
+                form.append("files", file, file.name);
+            });
+        }
 
         return form;
     };
@@ -257,20 +260,22 @@ export default function BugsForm(props){
                 <Grid item xs={12}>
                     <TextField
                         autoComplete="off"
-                        name="comments"
+                        name="comment"
                         variant="outlined"
                         fullWidth
-                        id="comments"
-                        label="Comments"
+                        id="comment"
+                        label="Comment"
                         onChange={handleChange}
-                        value={props.state.comments}
+                        value={props.state.comment}
                         multiline
                         rows={4}
                         className={classes.formControl}
                     />
                     {
-                        props.state.pathToAttachment
-                            && <Link href={props.state.pathToAttachment}>{props.state.pathToAttachment}</Link>
+                        props.state.comments &&
+                            props.state.comments.map(card => (
+                                <CommentCard date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} />
+                            ))
                     }
                 </Grid>
                 <Grid item xs={12}>
