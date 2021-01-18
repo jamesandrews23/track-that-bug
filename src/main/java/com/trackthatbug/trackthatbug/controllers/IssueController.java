@@ -33,33 +33,54 @@ public class IssueController {
                 @RequestPart("properties") @Valid Issue issue,
                 @RequestPart("files") MultipartFile[] files,
                 BindingResult bindingResult, Principal principal){
-        Result<Issue> createdIssue = new Result<>();
+        Result<Issue> savedIssue = new Result<>();
         String user = principal.getName();
-        issue.setUser(user);
-        issue.setCreatedBy(user);
-        issue.setCreatedOn(new Date());
-        issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
 
-        if(files.length > 0){
-            try {
-                //issue.getAttachments().put(files[0].getOriginalFilename(), new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
-                issue.setFileName(files[0].getOriginalFilename());
-                issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
-            } catch(IOException e){
-                //if file fails to load show error
-                createdIssue.setPayload(issue);
-                return new ResponseEntity<>(createdIssue, HttpStatus.BAD_REQUEST);
+        if(issue.getIssueNumber() > 0){
+            //not a new issue, modify it
+            issue.setLastModifiedBy(user);
+            issue.setLastModifiedDate(new Date());
+            if(files.length > 0){
+                try {
+                    addFilesToIssue(issue, files);
+                } catch(IOException e){
+                    savedIssue.setPayload(issue);
+                    return new ResponseEntity<>(savedIssue, HttpStatus.BAD_REQUEST);
+                }
             }
+            savedIssue.setMessage("Bug " + issue.getIssueNumber() + " modified");
+        } else {
+            issue.setUser(user);
+            issue.setCreatedBy(user);
+            issue.setCreatedOn(new Date());
+            issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
+
+            if(files.length > 0){
+                try {
+                    addFilesToIssue(issue, files);
+                } catch(IOException e){
+                    savedIssue.setPayload(issue);
+                    return new ResponseEntity<>(savedIssue, HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            if(issue.getComment() != null && !"".equals(issue.getComment())){
+                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
+            }
+
+            savedIssue.setMessage("But " + issue.getIssueNumber() + " created");
         }
 
-        if(issue.getComment() != null && issue.getComment() != ""){
-            issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
-        }
 
         issueRepository.save(issue);
 
-        createdIssue.setPayload(issue);
-        return new ResponseEntity<>(createdIssue, HttpStatus.OK);
+        savedIssue.setPayload(issue);
+        return new ResponseEntity<>(savedIssue, HttpStatus.OK);
+    }
+
+    public void addFilesToIssue(Issue issue, MultipartFile[] files) throws IOException {
+        issue.setFileName(files[0].getOriginalFilename());
+        issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
     }
 
     @PatchMapping(value = "/modifyIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -72,16 +93,6 @@ public class IssueController {
         issue.setUser(user);
         issue.setLastModifiedBy(user);
         issue.setLastModifiedDate(new Date());
-
-//        if(files.length > 0){
-//            try {
-//                issue.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
-//            } catch(IOException e){
-//                //if file fails to load show error
-//                modifiedIssue.setPayload(issue);
-//                return new ResponseEntity<>(modifiedIssue, HttpStatus.BAD_REQUEST);
-//            }
-//        }
 
         issueRepository.save(issue);
 

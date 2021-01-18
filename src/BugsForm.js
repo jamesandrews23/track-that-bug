@@ -103,7 +103,7 @@ export default function BugsForm(props){
             .then(response => {
                 setLoading(false);
                 props.setAlert({
-                    message: "Bug " + response.data.payload.issueNumber + " created successfully.",
+                    message: response.data.message,
                     severity: "success"
                 })
             })
@@ -164,23 +164,16 @@ export default function BugsForm(props){
                         loading={loading}
                         onClick={handleCreateIssue}
                         startIcon={<SaveIcon />}
+                        size="small"
                     >
                         Save
-                    </LoadingButton>
-                    <LoadingButton
-                        variant="contained"
-                        color="primary"
-                        loading={modifyLoading}
-                        onClick={handleModifyIssue}
-                        startIcon={<EditIcon />}
-                    >
-                        Modify
                     </LoadingButton>
                     <Button
                         variant={"contained"}
                         color={"primary"}
                         onClick={() => setOpenAttachFile(true)}
                         startIcon={<AttachFileIcon />}
+                        size="small"
                     >
                         Attach File
                     </Button>
@@ -188,15 +181,27 @@ export default function BugsForm(props){
                         style={{float: "right"}}
                         variant="contained"
                         color="primary"
+                        size="small"
                     >
                         Clear
                     </Button>
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField
+                        autoComplete="off"
+                        name="issueNumber"
+                        id="issueNumber"
+                        label="Issue Number"
+                        onChange={handleChange}
+                        value={props.state.issueNumber}
+                        disabled
+                        size="small"
+                    />
                 </Grid>
                 <Grid item xs={6}>
                     <TextField
                         autoComplete="off"
                         name="title"
-                        variant="outlined"
                         required
                         fullWidth
                         id="title"
@@ -204,8 +209,10 @@ export default function BugsForm(props){
                         autoFocus
                         onChange={handleChange}
                         value={props.state.title}
+                        size="small"
+                        tabIndex={"1"}
                     />
-                    <FormControl variant="outlined" className={classes.formControl}>
+                    <FormControl className={classes.formControl} size="small" tabIndex={"3"}>
                         <InputLabel id="assignedTo">Assigned To</InputLabel>
                         <Select
                             labelId="assignedTo"
@@ -215,6 +222,7 @@ export default function BugsForm(props){
                             label="Assigned To"
                             fullWidth
                             name="assignedTo"
+                            size="small"
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -227,15 +235,16 @@ export default function BugsForm(props){
                     <TextField
                         autoComplete="off"
                         name="description"
-                        variant="outlined"
                         required
                         fullWidth
                         id="description"
                         label="Description"
                         onChange={handleChange}
                         value={props.state.description}
+                        size="small"
+                        tabIndex={"2"}
                     />
-                    <FormControl variant="outlined" className={classes.formControl}>
+                    <FormControl className={classes.formControl} size="small" tabIndex={"4"}>
                         <InputLabel id="status">Status</InputLabel>
                         <Select
                             labelId="status"
@@ -245,6 +254,7 @@ export default function BugsForm(props){
                             label="Status"
                             fullWidth
                             name="status"
+                            size="small"
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -261,7 +271,6 @@ export default function BugsForm(props){
                     <TextField
                         autoComplete="off"
                         name="comment"
-                        variant="outlined"
                         fullWidth
                         id="comment"
                         label="Comment"
@@ -270,6 +279,8 @@ export default function BugsForm(props){
                         multiline
                         rows={4}
                         className={classes.formControl}
+                        size="small"
+                        tabIndex={"5"}
                     />
                     {
                         props.state.comments &&
