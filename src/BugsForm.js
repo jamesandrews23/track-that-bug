@@ -12,10 +12,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Alert from "@material-ui/lab/Alert";
 import green from "@material-ui/core/colors/green";
 import LoadingButton from "./components/LoadingButton";
-import Link from "@material-ui/core/Link";
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import SaveIcon from '@material-ui/icons/Save';
-import EditIcon from '@material-ui/icons/Edit';
 import CommentCard from "./components/CommentCard";
 
 const useStyles = makeStyles((theme) => ({
@@ -59,8 +57,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function BugsForm(props){
     const classes = useStyles();
-    const [loading, setLoading] = React.useState(false);
-    const [modifyLoading, setModifyLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState("false");
     const [files, setFiles] = React.useState();
     const [openAttachFile, setOpenAttachFile] = React.useState(false);
 
@@ -89,7 +86,7 @@ export default function BugsForm(props){
 
     const handleCreateIssue = e => {
         e.preventDefault();
-        setLoading(true);
+        setLoading("true");
 
         let form = getForm();
 
@@ -101,43 +98,14 @@ export default function BugsForm(props){
                 }
             })
             .then(response => {
-                setLoading(false);
+                setLoading("false");
                 props.setAlert({
                     message: response.data.message,
                     severity: "success"
                 })
             })
             .catch(error => {
-                setLoading(false);
-                props.setAlert({
-                    message: "An error has occurred. " + error.message,
-                    severity: "error"
-                })
-            });
-    };
-
-    const handleModifyIssue = e => {
-        e.preventDefault();
-        setModifyLoading(true);
-
-        let form = getForm();
-
-        axios.patch('/modifyIssue',
-            form,
-            {
-                headers: {
-                    'Content-Type' : undefined
-                }
-            })
-            .then(response => {
-                setModifyLoading(false);
-                props.setAlert({
-                    message: "Bug " + response.data.payload.issueNumber + " modified successfully.",
-                    severity: "success"
-                })
-            })
-            .catch(error => {
-                setModifyLoading(false);
+                setLoading("false");
                 props.setAlert({
                     message: "An error has occurred. " + error.message,
                     severity: "error"
@@ -285,8 +253,8 @@ export default function BugsForm(props){
                     />
                     {
                         props.state.comments &&
-                            props.state.comments.map(card => (
-                                <CommentCard date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} />
+                            props.state.comments.map((card, index) => (
+                                <CommentCard key={index} date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} />
                             ))
                     }
                 </Grid>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { green } from '@material-ui/core/colors';
 import Button from '@material-ui/core/Button';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -14,12 +14,6 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(0, 1, 0, 0),
         position: 'relative',
     },
-    // buttonSuccess: {
-    //     backgroundColor: green[500],
-    //     '&:hover': {
-    //         backgroundColor: green[700],
-    //     },
-    // },
     buttonProgress: {
         color: green[500],
         position: 'absolute',
@@ -33,20 +27,20 @@ const useStyles = makeStyles((theme) => ({
 export default function LoadingButton(props){
     const classes = useStyles();
 
-    // const buttonClassname = clsx({
-    //     [classes.buttonSuccess]: props.success,
-    // });
-
     return (
         <span className={classes.wrapper}>
             <Button
                 {...props}
-                disabled={props.loading}
+                disabled={props.loading === "true"}
                 onClick={props.onClick}
             >
                 {props.children}
             </Button>
-            {props.loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+            {props.loading === "true" ? <CircularProgress size={24} className={classes.buttonProgress} /> : undefined}
         </span>
     )
+}
+
+LoadingButton.propTypes = {
+    loading: PropTypes.string
 }

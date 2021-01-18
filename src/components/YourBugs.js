@@ -63,7 +63,7 @@ export default function YourBugs(props){
                     ? <List dense>
                         {
                             userIssues.map((issue) => (
-                                <ListItem>
+                                <ListItem key={issue.issueNumber}>
                                     <IconButton onClick={() => runBugSearch(issue.issueNumber)}>
                                         <BugReportIcon />
                                     </IconButton>
