@@ -33,49 +33,45 @@ public class IssueController {
                 @RequestPart("properties") @Valid Issue issue,
                 @RequestPart("files") MultipartFile[] files,
                 BindingResult bindingResult, Principal principal){
-        Result<Issue> savedIssue = new Result<>();
+        Result<Issue> issueResult = new Result<>();
         String user = principal.getName();
 
         if(issue.getIssueNumber() > 0){
             //not a new issue, modify it
             issue.setLastModifiedBy(user);
             issue.setLastModifiedDate(new Date());
-            if(files.length > 0){
-                try {
-                    addFilesToIssue(issue, files);
-                } catch(IOException e){
-                    savedIssue.setPayload(issue);
-                    return new ResponseEntity<>(savedIssue, HttpStatus.BAD_REQUEST);
-                }
-            }
-            savedIssue.setMessage("Bug " + issue.getIssueNumber() + " modified");
+            addAFile(issue, files, issueResult);
+            issueResult.setMessage("Bug " + issue.getIssueNumber() + " modified");
         } else {
             issue.setUser(user);
             issue.setCreatedBy(user);
             issue.setCreatedOn(new Date());
             issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
 
-            if(files.length > 0){
-                try {
-                    addFilesToIssue(issue, files);
-                } catch(IOException e){
-                    savedIssue.setPayload(issue);
-                    return new ResponseEntity<>(savedIssue, HttpStatus.BAD_REQUEST);
-                }
-            }
-
             if(issue.getComment() != null && !"".equals(issue.getComment())){
                 issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
             }
 
-            savedIssue.setMessage("But " + issue.getIssueNumber() + " created");
-        }
+            addAFile(issue, files, issueResult);
 
+            issueResult.setMessage("But " + issue.getIssueNumber() + " created");
+        }
 
         issueRepository.save(issue);
 
-        savedIssue.setPayload(issue);
-        return new ResponseEntity<>(savedIssue, HttpStatus.OK);
+        issueResult.setPayload(issue);
+        return new ResponseEntity<>(issueResult, HttpStatus.OK);
+    }
+
+    public void addAFile(Issue issue, MultipartFile[] files, Result<Issue> issueResult) {
+        if(files.length > 0){
+            try {
+                addFilesToIssue(issue, files);
+            } catch(IOException e){
+                issueResult.setPayload(issue);
+                //todo set an error here for adding file
+            }
+        }
     }
 
     public void addFilesToIssue(Issue issue, MultipartFile[] files) throws IOException {
