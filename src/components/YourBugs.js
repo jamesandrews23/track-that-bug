@@ -22,11 +22,11 @@ export default function YourBugs(props){
                 props.setBackdropOpen(false);
                 if(response.data.payload){
                     history.push("/bugs");
-                    props.setBugState(response.data.payload);
+                    props.setBugState({...props.state, ...response.data.payload });
                     props.setAlert({...alert, message: ""});
                 } else {
                     props.setAlert({message: "Bug not found", severity: "error"});
-                    props.setBugState({
+                    props.setBugState({...props.state,
                         title: "",
                         assignedTo: "",
                         description: "",

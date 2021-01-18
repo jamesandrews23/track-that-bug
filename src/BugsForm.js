@@ -182,6 +182,7 @@ export default function BugsForm(props){
                         variant="contained"
                         color="primary"
                         size="small"
+                        onClick={() => props.handleClearBugForm()}
                     >
                         Clear
                     </Button>

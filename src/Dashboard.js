@@ -168,16 +168,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Dashboard() {
-    const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
-    const [bugState, setBugState] = React.useState({
+    const defaultBugState = {
         title: "",
         assignedTo: "",
         description: "",
         status: "",
         lastModifiedBy: "",
         lastModifiedDate: "",
-    });
+        comment: "",
+        comments: [],
+        issueNumber: ""
+    }
+    const classes = useStyles();
+    const [open, setOpen] = React.useState(false);
+    const [bugState, setBugState] = React.useState(defaultBugState);
     const [alert, setAlert] = React.useState({
         message: "",
         severity: "success"
@@ -195,14 +199,7 @@ export default function Dashboard() {
                     setAlert({...alert, message: ""});
                 } else {
                     setAlert({message: "Bug not found", severity: "error"});
-                    setBugState({
-                        title: "",
-                        assignedTo: "",
-                        description: "",
-                        status: "",
-                        lastModifiedBy: "",
-                        lastModifiedDate: "",
-                    });
+                    setBugState(defaultBugState);
                 }
             })
             .catch(error => {
@@ -217,7 +214,12 @@ export default function Dashboard() {
         }
     };
 
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+    const handleClearBugForm = () => {
+        setAlert({...alert, message: ""});
+        setBugState(defaultBugState);
+    };
+
+    // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
         <Router>
@@ -293,7 +295,13 @@ export default function Dashboard() {
                                     <Overview setBugState={setBugState} setAlert={setAlert} setBackdropOpen={setBackdropOpen} />
                                 </Route>
                                 <Route path="/bugs">
-                                    <BugsForm state={bugState} setState={setBugState} alert={alert} setAlert={setAlert} />
+                                    <BugsForm
+                                        state={bugState}
+                                        setState={setBugState}
+                                        alert={alert}
+                                        setAlert={setAlert}
+                                        handleClearBugForm={handleClearBugForm}
+                                    />
                                 </Route>
                                 <Route path="/teams">
                                     <Teams />
