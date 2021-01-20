@@ -42,6 +42,10 @@ public class IssueController {
             issue.setLastModifiedDate(new Date());
             addAFile(issue, files, issueResult);
             issueResult.setMessage("Bug " + issue.getIssueNumber() + " modified");
+            if(issue.getComment() != null && !"".equals(issue.getComment())){
+                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
+                issue.setComment("");
+            }
         } else {
             issue.setUser(user);
             issue.setCreatedBy(user);
@@ -50,6 +54,7 @@ public class IssueController {
 
             if(issue.getComment() != null && !"".equals(issue.getComment())){
                 issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
+                issue.setComment("");
             }
 
             addAFile(issue, files, issueResult);
@@ -63,39 +68,6 @@ public class IssueController {
         return new ResponseEntity<>(issueResult, HttpStatus.OK);
     }
 
-    public void addAFile(Issue issue, MultipartFile[] files, Result<Issue> issueResult) {
-        if(files.length > 0){
-            try {
-                addFilesToIssue(issue, files);
-            } catch(IOException e){
-                issueResult.setPayload(issue);
-                //todo set an error here for adding file
-            }
-        }
-    }
-
-    public void addFilesToIssue(Issue issue, MultipartFile[] files) throws IOException {
-        issue.setFileName(files[0].getOriginalFilename());
-        issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
-    }
-
-    @PatchMapping(value = "/modifyIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Result<Issue>> modifyIssue(
-            @RequestPart("properties") @Valid Issue issue,
-            @RequestPart("files") MultipartFile[] files,
-            BindingResult bindingResult, Principal principal){
-        Result<Issue> modifiedIssue = new Result<>();
-        String user = principal.getName();
-        issue.setUser(user);
-        issue.setLastModifiedBy(user);
-        issue.setLastModifiedDate(new Date());
-
-        issueRepository.save(issue);
-
-        modifiedIssue.setPayload(issue);
-        return new ResponseEntity<>(modifiedIssue, HttpStatus.OK);
-    }
-
     @GetMapping(value = "/getIssue/{id}")
     public ResponseEntity<Result<Issue>> getIssue(@PathVariable("id") String issueNumber){
         Result<Issue> result = new Result<>();
@@ -106,7 +78,7 @@ public class IssueController {
             try {
                 if(issue.getFileName() != null && issue.getAttachment() != null){
                     Files.write(Paths.get(System.getProperty("user.dir") + BUILD_DIR + issue.getFileName()), issue.getAttachment().getData());
-                    issue.setPathToAttachment("/" + issue.getFileName());
+                    issue.setPathToAttachment(issue.getFileName());
                 }
             } catch (IOException io){
                 io.printStackTrace();
@@ -123,6 +95,22 @@ public class IssueController {
         Result<List<Issue>> result = new Result<>();
         result.setPayload(issueRepository.findAllBy(principal.getName()));
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    public void addAFile(Issue issue, MultipartFile[] files, Result<Issue> issueResult) {
+        if(files.length > 0){
+            try {
+                addFilesToIssue(issue, files);
+            } catch(IOException e){
+                issueResult.setPayload(issue);
+                //todo set an error here for adding file
+            }
+        }
+    }
+
+    public void addFilesToIssue(Issue issue, MultipartFile[] files) throws IOException {
+        issue.setFileName(files[0].getOriginalFilename());
+        issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
     }
 
     @Autowired

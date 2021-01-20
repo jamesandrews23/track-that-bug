@@ -53,6 +53,9 @@ const useStyles = makeStyles((theme) => ({
         marginTop: -12,
         marginLeft: -12,
     },
+    comment: {
+        marginBottom: theme.spacing(2)
+    }
 }));
 
 export default function BugsForm(props){
@@ -103,6 +106,8 @@ export default function BugsForm(props){
                     message: response.data.message,
                     severity: "success"
                 })
+                if(response.data.payload)
+                    props.setState(response.data.payload);
             })
             .catch(error => {
                 setLoading("false");
@@ -179,9 +184,9 @@ export default function BugsForm(props){
                         onChange={handleChange}
                         value={props.state.title}
                         size="small"
-                        tabIndex={"1"}
+                        inputProps={{ tabIndex: "1" }}
                     />
-                    <FormControl className={classes.formControl} size="small" tabIndex={"3"}>
+                    <FormControl className={classes.formControl} size="small">
                         <InputLabel id="assignedTo">Assigned To</InputLabel>
                         <Select
                             labelId="assignedTo"
@@ -192,6 +197,7 @@ export default function BugsForm(props){
                             fullWidth
                             name="assignedTo"
                             size="small"
+                            inputProps={{ tabIndex: "3" }}
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -211,9 +217,10 @@ export default function BugsForm(props){
                         onChange={handleChange}
                         value={props.state.description}
                         size="small"
-                        tabIndex={"2"}
+                        inputProps={{ tabIndex: "2" }}
+
                     />
-                    <FormControl className={classes.formControl} size="small" tabIndex={"4"}>
+                    <FormControl className={classes.formControl} size="small">
                         <InputLabel id="status">Status</InputLabel>
                         <Select
                             labelId="status"
@@ -224,6 +231,7 @@ export default function BugsForm(props){
                             fullWidth
                             name="status"
                             size="small"
+                            inputProps={{ tabIndex: "4" }}
                         >
                             <MenuItem value="">
                                 <em>None</em>
@@ -247,9 +255,9 @@ export default function BugsForm(props){
                         value={props.state.comment}
                         multiline
                         rows={4}
-                        className={classes.formControl}
                         size="small"
-                        tabIndex={"5"}
+                        inputProps={{ tabIndex: "5" }}
+                        className={classes.comment}
                     />
                     {
                         props.state.comments &&

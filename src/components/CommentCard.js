@@ -10,11 +10,10 @@ import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {AttachFile} from "@material-ui/icons";
-import Link from "@material-ui/core/Link";
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        maxWidth: 345,
+        marginBottom: theme.spacing(2)
     },
     media: {
         height: 0,
@@ -38,6 +37,10 @@ const useStyles = makeStyles((theme) => ({
 export default function CommentCard(props) {
     const classes = useStyles();
 
+    const openAttachment = () => {
+        window.open("/" + props.attachment, "_blank");
+    }
+
     return (
         <Card className={classes.root}>
             <CardHeader
@@ -60,8 +63,8 @@ export default function CommentCard(props) {
             </CardContent>
             <CardActions disableSpacing>
                 {
-                    props.attachment &&
-                        <IconButton aria-label="file attachment" component={<Link href={props.attachment} target={"_blank"} />}>
+                    props.attachment && props.attachment !== "" &&
+                        <IconButton aria-label="file attachment" onClick={openAttachment}>
                             <AttachFile />
                         </IconButton>
                 }
