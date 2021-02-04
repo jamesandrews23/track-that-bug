@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 export default function BugsForm(props){
     const classes = useStyles();
     const [loading, setLoading] = React.useState("false");
-    const [files, setFiles] = React.useState();
+    const [files, setFiles] = React.useState([]);
     const [openAttachFile, setOpenAttachFile] = React.useState(false);
 
     const getForm = () => {
@@ -93,7 +93,7 @@ export default function BugsForm(props){
         props.setState({...props.state, [name] : value});
     };
 
-    const handleCreateIssue = () => {
+    const handleSaveIssue = () => {
         setLoading("true");
 
         let form = getForm();
@@ -106,7 +106,8 @@ export default function BugsForm(props){
                 }
             })
             .then(response => {
-                setLoading("false");
+                setLoading("false"); //reset state
+                setFiles([]); //clear files for next save
                 props.setAlert({
                     message: response.data.message,
                     severity: "success"
@@ -140,7 +141,7 @@ export default function BugsForm(props){
                         variant="contained"
                         color="primary"
                         loading={loading}
-                        onClick={handleCreateIssue}
+                        onClick={handleSaveIssue}
                         startIcon={<SaveIcon />}
                         size="small"
                     >
@@ -267,7 +268,7 @@ export default function BugsForm(props){
                         <span className={classes.grow} />
                         {
                             props.state.issueNumber &&
-                            <IconButton onClick={() => handleCreateIssue()}>
+                            <IconButton onClick={() => handleSaveIssue()}>
                                 <SendIcon />
                             </IconButton>
                         }

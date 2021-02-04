@@ -45,6 +45,7 @@ public class IssueController {
             if(issue.getComment() != null && !"".equals(issue.getComment())){
                 issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName(), user));
                 issue.setComment("");
+                issue.setFileName("");
             }
         } else {
             issue.setUser(user);
@@ -55,6 +56,7 @@ public class IssueController {
             if(issue.getComment() != null && !"".equals(issue.getComment())){
                 issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName(), user));
                 issue.setComment("");
+                issue.setFileName("");
             }
 
             addAFile(issue, files, issueResult);

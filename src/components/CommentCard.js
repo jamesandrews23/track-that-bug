@@ -42,7 +42,7 @@ export default function CommentCard(props) {
     }
 
     return (
-        <Card className={classes.root}>
+        <Card className={classes.root} variant={"outlined"}>
             <CardHeader
                 avatar={
                     <Avatar aria-label="userAvatar" className={classes.avatar}>
