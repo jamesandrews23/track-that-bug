@@ -15,6 +15,9 @@ import LoadingButton from "./components/LoadingButton";
 import AttachFileIcon from '@material-ui/icons/AttachFile';
 import SaveIcon from '@material-ui/icons/Save';
 import CommentCard from "./components/CommentCard";
+import {AttachFile, Send} from "@material-ui/icons";
+import IconButton from "@material-ui/core/IconButton";
+import SendIcon from '@material-ui/icons/Send';
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -54,8 +57,11 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: -12,
     },
     comment: {
-        marginBottom: theme.spacing(2)
-    }
+        marginBottom: 0
+    },
+    grow: {
+        flexGrow: 1,
+    },
 }));
 
 export default function BugsForm(props){
@@ -87,8 +93,7 @@ export default function BugsForm(props){
         props.setState({...props.state, [name] : value});
     };
 
-    const handleCreateIssue = e => {
-        e.preventDefault();
+    const handleCreateIssue = () => {
         setLoading("true");
 
         let form = getForm();
@@ -141,15 +146,6 @@ export default function BugsForm(props){
                     >
                         Save
                     </LoadingButton>
-                    <Button
-                        variant={"contained"}
-                        color={"primary"}
-                        onClick={() => setOpenAttachFile(true)}
-                        startIcon={<AttachFileIcon />}
-                        size="small"
-                    >
-                        Attach File
-                    </Button>
                     <Button
                         style={{float: "right"}}
                         variant="contained"
@@ -245,6 +241,12 @@ export default function BugsForm(props){
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
+                    {
+                        props.state.comments &&
+                        props.state.comments.map((card, index) => (
+                            <CommentCard key={index} date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} />
+                        ))
+                    }
                     <TextField
                         autoComplete="off"
                         name="comment"
@@ -253,18 +255,23 @@ export default function BugsForm(props){
                         label="Comment"
                         onChange={handleChange}
                         value={props.state.comment}
-                        multiline
-                        rows={4}
                         size="small"
                         inputProps={{ tabIndex: "5" }}
                         className={classes.comment}
+                        placeholder={"Type a message here"}
                     />
-                    {
-                        props.state.comments &&
-                            props.state.comments.map((card, index) => (
-                                <CommentCard key={index} date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} />
-                            ))
-                    }
+                    <Grid item xs={12} style={{display: "flex"}}>
+                        <IconButton onClick={() => setOpenAttachFile(true)}>
+                            <AttachFile  />
+                        </IconButton>
+                        <span className={classes.grow} />
+                        {
+                            props.state.issueNumber &&
+                            <IconButton onClick={() => handleCreateIssue()}>
+                                <SendIcon />
+                            </IconButton>
+                        }
+                    </Grid>
                 </Grid>
                 <Grid item xs={12}>
                     <DropzoneDialog

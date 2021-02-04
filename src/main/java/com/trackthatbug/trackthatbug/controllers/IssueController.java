@@ -43,7 +43,7 @@ public class IssueController {
             addAFile(issue, files, issueResult);
             issueResult.setMessage("Bug " + issue.getIssueNumber() + " modified");
             if(issue.getComment() != null && !"".equals(issue.getComment())){
-                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
+                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName(), user));
                 issue.setComment("");
             }
         } else {
@@ -53,7 +53,7 @@ public class IssueController {
             issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
 
             if(issue.getComment() != null && !"".equals(issue.getComment())){
-                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName()));
+                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName(), user));
                 issue.setComment("");
             }
 
@@ -109,8 +109,10 @@ public class IssueController {
     }
 
     public void addFilesToIssue(Issue issue, MultipartFile[] files) throws IOException {
-        issue.setFileName(files[0].getOriginalFilename());
-        issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+        if(files.length > 0){
+            issue.setFileName(files[0].getOriginalFilename());
+            issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+        }
     }
 
     @Autowired

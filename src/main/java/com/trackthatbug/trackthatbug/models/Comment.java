@@ -7,14 +7,16 @@ public class Comment implements Serializable {
     private String commentMessage;
     private Date date;
     private String attachment;
+    private String user;
 
     public Comment() {
     }
 
-    public Comment(String commentMessage, Date date, String attachment) {
+    public Comment(String commentMessage, Date date, String attachment, String user) {
         this.commentMessage = commentMessage;
         this.date = date;
         this.attachment = attachment;
+        this.user = user;
     }
 
     public String getCommentMessage() {
@@ -39,5 +41,13 @@ public class Comment implements Serializable {
 
     public void setAttachment(String attachment) {
         this.attachment = attachment;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }
