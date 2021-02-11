@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {AttachFile} from "@material-ui/icons";
+import {DateTime} from "luxon";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -34,6 +35,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const parseDate = (date) => {
+    // let localTime = DateTime.local();
+    let postedTime = DateTime.fromISO(date);
+    console.log("parsed");
+    return postedTime.toLocaleString(DateTime.DATETIME_FULL);
+}
+
 export default function CommentCard(props) {
     const classes = useStyles();
 
@@ -54,7 +62,7 @@ export default function CommentCard(props) {
                         <MoreVertIcon />
                     </IconButton>
                 }
-                title={props.date}
+                title={parseDate(props.date)}
             />
             <CardContent>
                 <Typography variant="body2" color="textSecondary" component="p">
