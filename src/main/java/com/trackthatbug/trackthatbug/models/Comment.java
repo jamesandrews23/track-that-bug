@@ -1,18 +1,21 @@
 package com.trackthatbug.trackthatbug.models;
 
+import org.bson.types.Binary;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class Comment implements Serializable {
+    private long id;
     private String commentMessage;
     private Date date;
-    private String attachment;
+    private Binary attachment;
     private String user;
 
     public Comment() {
     }
 
-    public Comment(String commentMessage, Date date, String attachment, String user) {
+    public Comment(String commentMessage, Date date, Binary attachment, String user) {
         this.commentMessage = commentMessage;
         this.date = date;
         this.attachment = attachment;
@@ -35,11 +38,11 @@ public class Comment implements Serializable {
         this.date = date;
     }
 
-    public String getAttachment() {
+    public Binary getAttachment() {
         return attachment;
     }
 
-    public void setAttachment(String attachment) {
+    public void setAttachment(Binary attachment) {
         this.attachment = attachment;
     }
 

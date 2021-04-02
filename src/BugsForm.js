@@ -245,7 +245,7 @@ export default function BugsForm(props){
                     {
                         props.state.comments &&
                         props.state.comments.map((card, index) => (
-                            <CommentCard key={index} date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} />
+                            <CommentCard key={index} date={card.date} commentMessage={card.commentMessage} attachment={card.attachment} issueNumber={props.state.issueNumber} />
                         ))
                     }
                     <TextField

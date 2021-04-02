@@ -8,16 +8,18 @@ import com.trackthatbug.trackthatbug.services.NextSequenceService;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
 import javax.validation.Valid;
 import java.io.*;
-import java.nio.file.*;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
@@ -26,48 +28,40 @@ import java.util.List;
 public class IssueController {
     private IssueRepository issueRepository;
     private NextSequenceService nextSequenceService;
-    private static final String BUILD_DIR = "\\build\\resources\\main\\public\\";
 
     @PatchMapping(value = "/saveIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Result<Issue>> createIssue(
                 @RequestPart("properties") @Valid Issue issue,
                 @RequestPart("files") MultipartFile[] files,
-                BindingResult bindingResult, Principal principal){
+                BindingResult bindingResult,
+                Principal principal) {
         Result<Issue> issueResult = new Result<>();
         String user = principal.getName();
 
-        if(issue.getIssueNumber() > 0){
-            //not a new issue, modify it
-            issue.setLastModifiedBy(user);
-            issue.setLastModifiedDate(new Date());
-            addAFile(issue, files, issueResult);
-            issueResult.setMessage("Bug " + issue.getIssueNumber() + " modified");
-            if(issue.getComment() != null && !"".equals(issue.getComment())){
-                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName(), user));
-                issue.setComment("");
-                issue.setFileName("");
-            }
-        } else {
-            issue.setUser(user);
-            issue.setCreatedBy(user);
-            issue.setCreatedOn(new Date());
-            issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
-
-            if(issue.getComment() != null && !"".equals(issue.getComment())){
-                issue.getComments().add(new Comment(issue.getComment(), new Date(), issue.getFileName(), user));
-                issue.setComment("");
-                issue.setFileName("");
+        try {
+            if(issue.getIssueNumber() > 0){
+                //not a new issue, modify it
+                issue.setLastModifiedBy(user);
+                issue.setLastModifiedDate(new Date());
+                issueResult.setMessage("Bug " + issue.getIssueNumber() + " modified");
+                addComment(issue, files, user);
+            } else {
+                issue.setUser(user);
+                issue.setCreatedBy(user);
+                issue.setCreatedOn(new Date());
+                issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
+                addComment(issue, files, user);
+                issueResult.setMessage("But " + issue.getIssueNumber() + " created");
             }
 
-            addAFile(issue, files, issueResult);
+            issueRepository.save(issue);
+            issueResult.setPayload(issue);
 
-            issueResult.setMessage("But " + issue.getIssueNumber() + " created");
+            return new ResponseEntity<>(issueResult, HttpStatus.OK);
+        } catch(IOException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(issueResult, HttpStatus.BAD_REQUEST);
         }
-
-        issueRepository.save(issue);
-
-        issueResult.setPayload(issue);
-        return new ResponseEntity<>(issueResult, HttpStatus.OK);
     }
 
     @GetMapping(value = "/getIssue/{id}")
@@ -77,20 +71,26 @@ public class IssueController {
 
 
         if(issue != null){
-            try {
-                if(issue.getFileName() != null && issue.getAttachment() != null){
-                    Files.write(Paths.get(System.getProperty("user.dir") + BUILD_DIR + issue.getFileName()), issue.getAttachment().getData());
-                    issue.setPathToAttachment(issue.getFileName());
-                }
-            } catch (IOException io){
-                io.printStackTrace();
-            }
-
             result.setPayload(issue);
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @GetMapping("/getAttachment/{issueNum}")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable String issueNum) {
+        Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNum));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + issue.getFileName());
+        ByteArrayResource resource = new ByteArrayResource(issue.getComments().get(0).getAttachment().getData());
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
 
     @GetMapping("/byUser")
     public ResponseEntity<Result<List<Issue>>> retrieveBugsByUser(Principal principal){
@@ -99,21 +99,12 @@ public class IssueController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    public void addAFile(Issue issue, MultipartFile[] files, Result<Issue> issueResult) {
-        if(files.length > 0){
-            try {
-                addFilesToIssue(issue, files);
-            } catch(IOException e){
-                issueResult.setPayload(issue);
-                //todo set an error here for adding file
-            }
-        }
-    }
+    public void addComment(Issue issue, MultipartFile[] files, String user) throws IOException {
+        String commentMessage = issue.getComment();
 
-    public void addFilesToIssue(Issue issue, MultipartFile[] files) throws IOException {
-        if(files.length > 0){
-            issue.setFileName(files[0].getOriginalFilename());
-            issue.setAttachment(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+        if(commentMessage != null && !"".equals(commentMessage) || files.length > 0){
+            issue.getComments().add(new Comment(issue.getComment(), new Date(), new Binary(
+                    BsonBinarySubType.BINARY, files[0].getBytes()), issue.getUser()));
         }
     }
 

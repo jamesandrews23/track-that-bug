@@ -1,15 +1,11 @@
 package com.trackthatbug.trackthatbug.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.bson.types.Binary;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.File;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 @Document(collection = "issues")
@@ -29,11 +25,8 @@ public class Issue {
     //todo @LastModifiedDate add a field for the last modified date
 
     private String fileName;
-    @JsonIgnore
-    private Binary attachment;
     private String lastModifiedBy;
     private Date lastModifiedDate;
-    private String pathToAttachment;
     private String comment;
     private List<Comment> comments;
 
@@ -77,15 +70,6 @@ public class Issue {
     public void setAssignedTo(String assignedTo) {
         this.assignedTo = assignedTo;
     }
-
-//    public ZonedDateTime getCreatedOn() {
-//        return createdOn;
-//    }
-//
-//    public void setCreatedOn(ZonedDateTime createdOn) {
-//        this.createdOn = createdOn;
-//    }
-
 
     public Date getCreatedOn() {
         return createdOn;
@@ -135,14 +119,6 @@ public class Issue {
         this.fileName = fileName;
     }
 
-    public Binary getAttachment() {
-        return attachment;
-    }
-
-    public void setAttachment(Binary attachment) {
-        this.attachment = attachment;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -157,14 +133,6 @@ public class Issue {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public String getPathToAttachment() {
-        return pathToAttachment;
-    }
-
-    public void setPathToAttachment(String pathToAttachment) {
-        this.pathToAttachment = pathToAttachment;
     }
 
     public String getComment() {

@@ -11,6 +11,7 @@ import { red } from '@material-ui/core/colors';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import {AttachFile} from "@material-ui/icons";
 import {DateTime} from "luxon";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,7 +47,18 @@ export default function CommentCard(props) {
     const classes = useStyles();
 
     const openAttachment = () => {
-        window.open("/" + props.attachment, "_blank");
+        axios({
+            url: '/getAttachment/' + props.issueNumber,
+            method: 'GET',
+            responseType: 'blob', // Important
+        }).then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', ''); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+        });
     }
 
     return (
