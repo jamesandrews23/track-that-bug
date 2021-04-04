@@ -23,6 +23,7 @@ import java.io.*;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class IssueController {
@@ -77,18 +78,30 @@ public class IssueController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/getAttachment/{issueNum}")
-    public ResponseEntity<Resource> downloadAttachment(@PathVariable String issueNum) {
+    @GetMapping("/getAttachment/{issueNum}/{id}")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable String issueNum, @PathVariable String id) {
         Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNum));
+        UUID commentId = UUID.fromString(id);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + issue.getFileName());
-        ByteArrayResource resource = new ByteArrayResource(issue.getComments().get(0).getAttachment().getData());
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentLength(resource.contentLength())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+
+        ByteArrayResource resource = null;
+        for(Comment comment : issue.getComments()){
+            if(comment.getId().equals(commentId)){
+                resource = new ByteArrayResource(comment.getFile().getData());
+            }
+        }
+
+        if(resource != null){
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(resource.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -101,11 +114,20 @@ public class IssueController {
 
     public void addComment(Issue issue, MultipartFile[] files, String user) throws IOException {
         String commentMessage = issue.getComment();
+        Comment comment = new Comment();
 
-        if(commentMessage != null && !"".equals(commentMessage) || files.length > 0){
-            issue.getComments().add(new Comment(issue.getComment(), new Date(), new Binary(
-                    BsonBinarySubType.BINARY, files[0].getBytes()), issue.getUser()));
+        if(commentMessage != null && !"".equals(commentMessage)){
+            comment.setCommentMessage(commentMessage);
         }
+
+        if(files != null && files.length > 0){
+            comment.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+            comment.setAttachment(true);
+        }
+
+        comment.setUser(user);
+        comment.setDate(new Date());
+        issue.getComments().add(comment);
     }
 
     @Autowired

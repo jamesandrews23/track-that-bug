@@ -48,7 +48,7 @@ export default function CommentCard(props) {
 
     const openAttachment = () => {
         axios({
-            url: '/getAttachment/' + props.issueNumber,
+            url: '/getAttachment/' + props.issueNumber + "/" + props.id,
             method: 'GET',
             responseType: 'blob', // Important
         }).then((response) => {
@@ -83,7 +83,7 @@ export default function CommentCard(props) {
             </CardContent>
             <CardActions disableSpacing>
                 {
-                    props.attachment && props.attachment !== "" &&
+                    props.attachment &&
                         <IconButton aria-label="file attachment" onClick={openAttachment}>
                             <AttachFile />
                         </IconButton>

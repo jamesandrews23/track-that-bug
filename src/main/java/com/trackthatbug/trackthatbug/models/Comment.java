@@ -1,24 +1,30 @@
 package com.trackthatbug.trackthatbug.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.Binary;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 public class Comment implements Serializable {
-    private long id;
+    private UUID id;
     private String commentMessage;
     private Date date;
-    private Binary attachment;
+    @JsonIgnore
+    private Binary file;
     private String user;
+    private boolean attachment;
 
     public Comment() {
+        this.id = UUID.randomUUID();
     }
 
-    public Comment(String commentMessage, Date date, Binary attachment, String user) {
+    public Comment(String commentMessage, Date date, Binary file, String user) {
+        this.id = UUID.randomUUID();
         this.commentMessage = commentMessage;
         this.date = date;
-        this.attachment = attachment;
+        this.file = file;
         this.user = user;
     }
 
@@ -38,12 +44,12 @@ public class Comment implements Serializable {
         this.date = date;
     }
 
-    public Binary getAttachment() {
-        return attachment;
+    public Binary getFile() {
+        return file;
     }
 
-    public void setAttachment(Binary attachment) {
-        this.attachment = attachment;
+    public void setFile(Binary file) {
+        this.file = file;
     }
 
     public String getUser() {
@@ -52,5 +58,21 @@ public class Comment implements Serializable {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public boolean isAttachment() {
+        return attachment;
+    }
+
+    public void setAttachment(boolean attachment) {
+        this.attachment = attachment;
     }
 }
