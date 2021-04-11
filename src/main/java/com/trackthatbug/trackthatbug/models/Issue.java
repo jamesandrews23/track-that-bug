@@ -24,7 +24,6 @@ public class Issue {
     private Date createdOn;
     //todo @LastModifiedDate add a field for the last modified date
 
-    private String fileName;
     private String lastModifiedBy;
     private Date lastModifiedDate;
     private String comment;
@@ -109,14 +108,6 @@ public class Issue {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public String getLastModifiedBy() {

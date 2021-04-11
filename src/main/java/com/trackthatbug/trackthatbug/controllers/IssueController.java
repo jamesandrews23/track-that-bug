@@ -1,5 +1,6 @@
 package com.trackthatbug.trackthatbug.controllers;
 
+import com.trackthatbug.trackthatbug.models.AttachmentRequest;
 import com.trackthatbug.trackthatbug.models.Comment;
 import com.trackthatbug.trackthatbug.models.Issue;
 import com.trackthatbug.trackthatbug.models.Result;
@@ -52,7 +53,7 @@ public class IssueController {
                 issue.setCreatedOn(new Date());
                 issue.setIssueNumber(nextSequenceService.getNextSequence("CustomSequence"));
                 addComment(issue, files, user);
-                issueResult.setMessage("But " + issue.getIssueNumber() + " created");
+                issueResult.setMessage("Bug " + issue.getIssueNumber() + " created");
             }
 
             issueRepository.save(issue);
@@ -70,7 +71,6 @@ public class IssueController {
         Result<Issue> result = new Result<>();
         Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNumber));
 
-
         if(issue != null){
             result.setPayload(issue);
         }
@@ -78,18 +78,18 @@ public class IssueController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("/getAttachment/{issueNum}/{id}")
-    public ResponseEntity<Resource> downloadAttachment(@PathVariable String issueNum, @PathVariable String id) {
-        Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNum));
-        UUID commentId = UUID.fromString(id);
+    @PostMapping(value = "/getAttachment")
+    public ResponseEntity<Resource> downloadAttachment(@RequestBody AttachmentRequest request) {
+        Issue issue = issueRepository.findByIssueNumber(Long.parseLong(request.getIssueNumber()));
+        UUID commentId = UUID.fromString(request.getId());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + issue.getFileName());
 
         ByteArrayResource resource = null;
         for(Comment comment : issue.getComments()){
             if(comment.getId().equals(commentId)){
                 resource = new ByteArrayResource(comment.getFile().getData());
+                headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + comment.getFileName());
             }
         }
 
@@ -121,7 +121,9 @@ public class IssueController {
         }
 
         if(files != null && files.length > 0){
+            comment.setFileInBytes(files[0].getBytes());
             comment.setFile(new Binary(BsonBinarySubType.BINARY, files[0].getBytes()));
+            comment.setFileName(files[0].getOriginalFilename());
             comment.setAttachment(true);
         }
 

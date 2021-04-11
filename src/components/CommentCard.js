@@ -48,14 +48,25 @@ export default function CommentCard(props) {
 
     const openAttachment = () => {
         axios({
-            url: '/getAttachment/' + props.issueNumber + "/" + props.id,
-            method: 'GET',
+            url: '/getAttachment',
+            method: 'POST',
             responseType: 'blob', // Important
+            transformRequest: [function (data, headers) {
+                // Do whatever you want to transform the data
+                headers.post["Content-Type"] = 'application/json';
+                return JSON.stringify(data);
+            }],
+            data: {
+                id: props.id,
+                issueNumber: props.issueNumber,
+                fileName: ''
+            }
         }).then((response) => {
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const url = window.URL.createObjectURL(response.data);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', ''); //or any other extension
+            let filename = response.headers["content-disposition"].split("filename=")[1];
+            link.setAttribute('download', filename); //or any other extension
             document.body.appendChild(link);
             link.click();
         });

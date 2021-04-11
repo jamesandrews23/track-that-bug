@@ -15,6 +15,8 @@ public class Comment implements Serializable {
     private Binary file;
     private String user;
     private boolean attachment;
+    private String fileName;
+    private byte[] fileInBytes;
 
     public Comment() {
         this.id = UUID.randomUUID();
@@ -74,5 +76,21 @@ public class Comment implements Serializable {
 
     public void setAttachment(boolean attachment) {
         this.attachment = attachment;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public byte[] getFileInBytes() {
+        return fileInBytes;
+    }
+
+    public void setFileInBytes(byte[] fileInBytes) {
+        this.fileInBytes = fileInBytes;
     }
 }
