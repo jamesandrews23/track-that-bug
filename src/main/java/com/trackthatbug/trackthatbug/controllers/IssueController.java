@@ -129,6 +129,7 @@ public class IssueController {
 
         comment.setUser(user);
         comment.setDate(new Date());
+        issue.setComment("");
         issue.getComments().add(comment);
     }
 
