@@ -257,8 +257,8 @@ export default function Dashboard() {
                                     inputProps={{ 'aria-label': 'search' }}
                                     onKeyPress={(e) => handleIssueSearch(e, history)}
                                 />
-                            )} />
-
+                            )}
+                            />
                         </div>
                         <IconButton color="inherit">
                             <Badge badgeContent={4} color="secondary">
@@ -283,7 +283,9 @@ export default function Dashboard() {
                         </IconButton>
                     </div>
                     <Divider />
-                    <List><MainListItems /></List>
+                    <List>
+                        <MainListItems />
+                    </List>
                     <Divider />
                 </Drawer>
                 <main className={classes.content}>

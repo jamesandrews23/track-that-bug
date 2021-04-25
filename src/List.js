@@ -7,25 +7,26 @@ import BugReportIcon from '@material-ui/icons/BugReport';
 import {Link} from "react-router-dom";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import { useLocation } from "react-router-dom";
 
 export default function MainListItems() {
-    const [selected, setSelected] = React.useState(0);
+    const location = useLocation();
 
     return (
         <MenuList>
-            <MenuItem button component={Link} to={'/dashboard'} selected={selected === 0} onClick={() => setSelected(0)}>
+            <MenuItem button component={Link} to={'/dashboard'} selected={location.pathname.includes('dashboard')}>
                 <ListItemIcon>
                     <DashboardIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Dashboard"/>
             </MenuItem>
-            <MenuItem button component={Link} to={'/bugs'} selected={selected === 1} onClick={() => setSelected(1)}>
+            <MenuItem button component={Link} to={'/bugs'} selected={location.pathname.includes('bugs')}>
                 <ListItemIcon>
                     <BugReportIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Bugs"/>
             </MenuItem>
-            <MenuItem button component={Link} to={'/teams'} selected={selected === 2} onClick={() => setSelected(2)}>
+            <MenuItem button component={Link} to={'/teams'} selected={location.pathname.includes('teams')}>
                 <ListItemIcon>
                     <PeopleIcon/>
                 </ListItemIcon>
