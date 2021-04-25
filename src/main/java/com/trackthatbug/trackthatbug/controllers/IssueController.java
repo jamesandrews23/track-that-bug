@@ -113,6 +113,12 @@ public class IssueController {
     }
 
     public void addComment(Issue issue, MultipartFile[] files, String user) throws IOException {
+        Issue savedIssue = issueRepository.findByIssueNumber(issue.getIssueNumber());
+
+        if(savedIssue != null){
+            issue.setComments(savedIssue.getComments());
+        }
+
         String commentMessage = issue.getComment();
         Comment comment = new Comment();
 
