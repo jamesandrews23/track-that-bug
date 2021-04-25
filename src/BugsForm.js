@@ -4,7 +4,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import axios from "axios";
-import {DropzoneDialog} from "material-ui-dropzone";
+import {DropzoneDialogBase} from "material-ui-dropzone";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
@@ -18,6 +18,7 @@ import CommentCard from "./components/CommentCard";
 import {AttachFile, Send} from "@material-ui/icons";
 import IconButton from "@material-ui/core/IconButton";
 import SendIcon from '@material-ui/icons/Send';
+import Badge from "@material-ui/core/Badge";
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -78,8 +79,8 @@ export default function BugsForm(props){
         }));
 
         if(files){
-            files.forEach(file =>{
-                form.append("files", file, file.name);
+            files.forEach(fileObj =>{
+                form.append("files", fileObj.file, fileObj.file.name);
             });
         }
 
@@ -123,6 +124,10 @@ export default function BugsForm(props){
                 })
             });
     };
+
+    const attachFile = (files) => {
+        setOpenAttachFile(false);
+    }
 
     return (
         <form className={classes.form} noValidate>
@@ -270,7 +275,9 @@ export default function BugsForm(props){
                     />
                     <Grid item xs={12} style={{display: "flex"}}>
                         <IconButton onClick={() => setOpenAttachFile(true)}>
-                            <AttachFile  />
+                            <Badge color={"secondary"} badgeContent={files.length}>
+                                <AttachFile  />
+                            </Badge>
                         </IconButton>
                         <span className={classes.grow} />
                         {
@@ -282,18 +289,26 @@ export default function BugsForm(props){
                     </Grid>
                 </Grid>
                 <Grid item xs={12}>
-                    <DropzoneDialog
+                    <DropzoneDialogBase
                         cancelButtonText={"cancel"}
                         submitButtonText={"submit"}
                         maxFileSize={128000}
                         open={openAttachFile}
                         onClose={() => setOpenAttachFile(false)}
-                        onSave={(files) => {
-                            setFiles(files)
-                            setOpenAttachFile(false);
-                        }}
+                        onSave={(files) => attachFile(files)}
+                        initialFiles={[files]}
                         showPreviews={true}
                         showFileNamesInPreview={true}
+
+                        // dialogTitle={dialogTitle()}
+                        // acceptedFiles={['image/*']}
+                        fileObjects={files}
+                        onAdd={newFileObjs => {
+                            setFiles([].concat(files, newFileObjs));
+                        }}
+                        onDelete={deleteFileObj => {
+                            setFiles(files.filter(fileObj => { return deleteFileObj.file.name !== fileObj.file.name }));
+                        }}
                     />
                 </Grid>
             </Grid>
