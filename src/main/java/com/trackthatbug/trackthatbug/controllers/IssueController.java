@@ -1,10 +1,8 @@
 package com.trackthatbug.trackthatbug.controllers;
 
-import com.trackthatbug.trackthatbug.models.AttachmentRequest;
-import com.trackthatbug.trackthatbug.models.Comment;
-import com.trackthatbug.trackthatbug.models.Issue;
-import com.trackthatbug.trackthatbug.models.Result;
+import com.trackthatbug.trackthatbug.models.*;
 import com.trackthatbug.trackthatbug.repositories.IssueRepository;
+import com.trackthatbug.trackthatbug.repositories.UserRepository;
 import com.trackthatbug.trackthatbug.services.NextSequenceService;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
@@ -25,11 +23,13 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 public class IssueController {
     private IssueRepository issueRepository;
     private NextSequenceService nextSequenceService;
+    private UserRepository userRepository;
 
     @PatchMapping(value = "/saveIssue", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Result<Issue>> createIssue(
@@ -67,9 +67,9 @@ public class IssueController {
     }
 
     @GetMapping(value = "/getIssue/{id}")
-    public ResponseEntity<Result<Issue>> getIssue(@PathVariable("id") String issueNumber){
+    public ResponseEntity<Result<Issue>> getIssue(@PathVariable("id") Long issueNumber){
         Result<Issue> result = new Result<>();
-        Issue issue = issueRepository.findByIssueNumber(Long.parseLong(issueNumber));
+        Issue issue = issueRepository.findByIssueNumber(issueNumber);
 
         if(issue != null){
             result.setPayload(issue);
@@ -112,6 +112,14 @@ public class IssueController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<Result<List<String>>> getAllUsers(){
+        Result<List<String>> result = new Result<>();
+
+        result.setPayload(getAllUserNames());
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     public void addComment(Issue issue, MultipartFile[] files, String user) throws IOException {
         Issue savedIssue = issueRepository.findByIssueNumber(issue.getIssueNumber());
 
@@ -139,6 +147,11 @@ public class IssueController {
         issue.getComments().add(comment);
     }
 
+    private List<String> getAllUserNames(){
+        List<User> users = userRepository.findAll();
+        return users.stream().map(User::getUsername).collect(Collectors.toList());
+    }
+
     @Autowired
     public void setIssueRepository(IssueRepository issueRepository) {
         this.issueRepository = issueRepository;
@@ -147,5 +160,10 @@ public class IssueController {
     @Autowired
     public void setNextSequenceService(NextSequenceService nextSequenceService) {
         this.nextSequenceService = nextSequenceService;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 }

@@ -39,7 +39,13 @@ public class User {
     public User() {
     }
 
-    public User(String email, String username, String password, String firstName, String lastName, boolean enabled, Set<Role> roles) {
+    public User(String email,
+                String username,
+                String password,
+                String firstName,
+                String lastName,
+                boolean enabled,
+                Set<Role> roles) {
         this.email = email;
         this.username = username;
         this.password = password;

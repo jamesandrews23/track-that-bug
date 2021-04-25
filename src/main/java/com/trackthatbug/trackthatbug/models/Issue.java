@@ -23,18 +23,21 @@ public class Issue {
     @CreatedDate
     private Date createdOn;
     //todo @LastModifiedDate add a field for the last modified date
-
     private String lastModifiedBy;
     private Date lastModifiedDate;
     private String comment;
     private List<Comment> comments;
 
     public Issue() {
-        this.status = Status.OPEN;
+        this.user = "";
         this.assignedTo = "";
+        this.createdBy = "";
         this.description = "";
         this.title = "";
+        this.status = Status.OPEN;
+        this.createdOn = new Date();
         this.lastModifiedBy = "";
+        this.lastModifiedDate = new Date();
         this.comments = new ArrayList<>();
     }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -70,6 +70,7 @@ export default function BugsForm(props){
     const [loading, setLoading] = React.useState("false");
     const [files, setFiles] = React.useState([]);
     const [openAttachFile, setOpenAttachFile] = React.useState(false);
+    const [allUsers, setAllUsers] = React.useState([]);
 
     const getForm = () => {
         let form = new FormData();
@@ -125,9 +126,22 @@ export default function BugsForm(props){
             });
     };
 
-    const attachFile = (files) => {
+    const attachFile = () => {
         setOpenAttachFile(false);
     }
+
+    const getAllUsers = () => {
+        axios.get("/getAllUsers", {})
+            .then(rs => {
+                if(rs.data.payload){
+                    setAllUsers(rs.data.payload);
+                }
+            })
+    }
+
+    useEffect(() => {
+        getAllUsers();
+    }, []);
 
     return (
         <form className={classes.form} noValidate>
@@ -200,11 +214,13 @@ export default function BugsForm(props){
                             name="assignedTo"
                             size="small"
                             inputProps={{ tabIndex: "3" }}
+                            defaultValue={""}
                         >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value="james">James</MenuItem>
+                            {
+                                allUsers && allUsers.map(user => (
+                                    <MenuItem value={user} key={user}>{user}</MenuItem>
+                                ))
+                            }
                         </Select>
                     </FormControl>
                 </Grid>
