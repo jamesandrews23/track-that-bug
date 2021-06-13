@@ -7,6 +7,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import Avatar from "@material-ui/core/Avatar";
 
 export default function UserDrawer(props) {
 
@@ -15,6 +16,14 @@ export default function UserDrawer(props) {
             role="presentation"
         >
             <List>
+                <ListItem button key={"0"}>
+                    <ListItemIcon>
+                        <Avatar aria-label="userAvatar">
+                            R
+                        </Avatar>
+                    </ListItemIcon>
+                    <ListItemText>James Andrews</ListItemText>
+                </ListItem>
                 {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
                     <ListItem button key={text}>
                         <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
