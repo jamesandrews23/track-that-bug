@@ -29,6 +29,7 @@ import axios from 'axios';
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import PersonIcon from '@material-ui/icons/Person';
+import UserDrawer from "./components/UserDrawer";
 
 function Copyright() {
     return (
@@ -188,6 +189,7 @@ export default function Dashboard() {
         severity: "success"
     });
     const [backdropOpen, setBackdropOpen] = React.useState(false);
+    const [userDrawerOpen, setUserDrawerOpen] = React.useState(false);
 
     const runBugSearch = (issueNum) => {
         setBackdropOpen(true);
@@ -219,6 +221,14 @@ export default function Dashboard() {
         setAlert({...alert, message: ""});
         setBugState(defaultBugState);
     };
+
+    const toggleUserDrawer = (event, open) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+
+        setUserDrawerOpen(open);
+    }
 
     // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
@@ -266,7 +276,7 @@ export default function Dashboard() {
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
-                        <IconButton color="inherit">
+                        <IconButton color="inherit" onClick={(e) => toggleUserDrawer(e,true)}>
                             <PersonIcon />
                         </IconButton>
                         <IconButton color="inherit" onClick={ () => window.location.href = "/logout" }>
@@ -274,6 +284,7 @@ export default function Dashboard() {
                         </IconButton>
                     </Toolbar>
                 </AppBar>
+                <UserDrawer toggleDrawer={toggleUserDrawer} isOpen={userDrawerOpen} />
                 <Drawer
                     variant="permanent"
                     classes={{
