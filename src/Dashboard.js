@@ -28,6 +28,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import axios from 'axios';
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import PersonIcon from '@material-ui/icons/Person';
 
 function Copyright() {
     return (
@@ -264,6 +265,9 @@ export default function Dashboard() {
                             <Badge badgeContent={4} color="secondary">
                                 <NotificationsIcon />
                             </Badge>
+                        </IconButton>
+                        <IconButton color="inherit">
+                            <PersonIcon />
                         </IconButton>
                         <IconButton color="inherit" onClick={ () => window.location.href = "/logout" }>
                             <ExitToAppIcon />
