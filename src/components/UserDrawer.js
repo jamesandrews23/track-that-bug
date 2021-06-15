@@ -32,7 +32,7 @@ export default function UserDrawer(props) {
                 <ListItem button key={"0"}>
                     <ListItemIcon>
                         <Avatar aria-label="userAvatar">
-                            R
+                            {userName != null && userName.charAt(0).toUpperCase()}
                         </Avatar>
                     </ListItemIcon>
                     <ListItemText>{userName}</ListItemText>
