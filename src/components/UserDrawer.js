@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -10,6 +10,17 @@ import MailIcon from '@material-ui/icons/Mail';
 import Avatar from "@material-ui/core/Avatar";
 
 export default function UserDrawer(props) {
+    const [userName, setUserName] = useState(null);
+
+    useEffect(() => {
+        fetch("/getUserInfo")
+            .then(response => response.json())
+            .then(data => {
+                if(data){
+                    setUserName(data.userName);
+                }
+            });
+    });
 
     const list = () => (
         <div
@@ -22,7 +33,7 @@ export default function UserDrawer(props) {
                             R
                         </Avatar>
                     </ListItemIcon>
-                    <ListItemText>James Andrews</ListItemText>
+                    <ListItemText>{userName}</ListItemText>
                 </ListItem>
                 {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
                     <ListItem button key={text}>
