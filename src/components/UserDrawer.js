@@ -13,13 +13,15 @@ export default function UserDrawer(props) {
     const [userName, setUserName] = useState(null);
 
     useEffect(() => {
-        fetch("/getUserInfo")
-            .then(response => response.json())
-            .then(data => {
-                if(data){
-                    setUserName(data.userName);
-                }
-            });
+        if(userName == null){
+            fetch("/getUserInfo")
+                .then(response => response.json())
+                .then(data => {
+                    if(data){
+                        setUserName(data.userName);
+                    }
+                });
+        }
     });
 
     const list = () => (
