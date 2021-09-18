@@ -1,12 +1,22 @@
 package com.trackthatbug.trackthatbug.models;
 
+import org.springframework.validation.ObjectError;
+
+import java.util.Collections;
+import java.util.List;
+
 public class Result<T> {
-    private boolean error;
+    private boolean error = false;
     private String message;
     private T payload;
+    private List<ObjectError> errors = Collections.emptyList();
 
     public Result(){
-        this.error = false;
+
+    }
+
+    public Result(T payload) {
+        this.payload = payload;
     }
 
     public boolean isError() {
@@ -31,5 +41,13 @@ public class Result<T> {
 
     public void setPayload(T payload) {
         this.payload = payload;
+    }
+
+    public List<ObjectError> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<ObjectError> errors) {
+        this.errors = errors;
     }
 }

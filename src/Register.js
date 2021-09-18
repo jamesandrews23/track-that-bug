@@ -1,10 +1,7 @@
 import React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
@@ -94,6 +91,7 @@ export default function Register() {
     const [status, setStatus] = React.useState('');
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState(false);
+    const [file, setFile] = React.useState(null);
 
     const formik = useFormik({
         initialValues: {
@@ -102,7 +100,7 @@ export default function Register() {
             email: '',
             username: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
         },
         validate,
         validationSchema: validationSchema,
@@ -117,10 +115,11 @@ export default function Register() {
         let data = {
             "firstName" : values.firstName,
             "lastName" : values.lastName,
-            "email" : values.email,
+            "emailAddress" : values.email,
             "username" : values.username,
             "password" : values.password,
-            "confirmPassword" : values.confirmPassword
+            "confirmPassword" : values.confirmPassword,
+            "userProfileImage" : [file]
         }
 
         axios.post("/registerUser",
@@ -141,6 +140,10 @@ export default function Register() {
                 setError(true);
                 setStatus("An error has occurred. Please try again later.");
             })
+    }
+
+    const handleFileUploadChange = event => {
+        setFile(event.target.files[0]);
     }
 
     return (
@@ -261,6 +264,16 @@ export default function Register() {
                         {/*        label="I want to receive inspiration, marketing promotions and updates via email."*/}
                         {/*    />*/}
                         {/*</Grid>*/}
+                        <Grid item xs={12}>
+                            <TextField
+                                type="file"
+                                name="uploadFile"
+                                fullWidth
+                                id="uploadFile"
+                                label="Upload File"
+                                onChange={handleFileUploadChange}
+                            />
+                        </Grid>
                     </Grid>
                     <LoadingButton
                         type="submit"

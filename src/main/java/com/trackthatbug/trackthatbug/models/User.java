@@ -6,8 +6,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Document(collection = "users")
@@ -15,23 +13,11 @@ public class User {
     @Id private String id;
 //    @Indexed(unique = true, direction = IndexDirection.DESCENDING)
     private String email;
-
     @Indexed(unique = true, direction = IndexDirection.DESCENDING)
-    @NotEmpty
     private String username;
-
-    @NotEmpty
     private String password;
-
-    @NotEmpty
-    private String confirmPassword;
-
-    @NotEmpty
     private String firstName;
-
-    @NotEmpty
     private String lastName;
-
     private boolean enabled;
     @DBRef
     private Set<Role> roles;
@@ -53,6 +39,14 @@ public class User {
         this.lastName = lastName;
         this.enabled = enabled;
         this.roles = roles;
+    }
+
+    public User(RegisterUserDTO userDTO){
+        this.email = userDTO.getEmailAddress();
+        this.username = userDTO.getUsername();
+        this.password = userDTO.getPassword();
+        this.firstName = userDTO.getFirstName();
+        this.lastName = userDTO.getLastName();
     }
 
     public String getId() {
@@ -117,13 +111,5 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 }
